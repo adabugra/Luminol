@@ -1,11 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
 Date: Wed, 18 Sep 2024 23:10:47 +0800
-Subject: [PATCH] Add experimental config for folia scheduled issue fixing
+Subject: [PATCH] Add experimental config for folia scheduling issue fixing
 
 
 diff --git a/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java b/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
-index a1e1782d87403ca8934d37361be7ba66ddba133f..75a5d32c9b9f0d75c768dbf65cd081f69c842825 100644
+index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00d13f4fcc 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
 @@ -48,8 +48,29 @@ public final class RegionizedTaskQueue {
@@ -72,74 +72,72 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..75a5d32c9b9f0d75c768dbf65cd081f6
          return ret;
      }
  
-@@ -136,6 +178,83 @@ public final class RegionizedTaskQueue {
+@@ -136,6 +178,81 @@ public final class RegionizedTaskQueue {
              }
          }
  
 +        // Luminol start - Try fixing scheduling
++        private final java.util.concurrent.locks.Lock referenceCountersLock = new java.util.concurrent.locks.ReentrantLock(true);
++
 +        private void luminolReplaced$decrementReference(final AtomicLong reference, final long coord) {
-+            final long val = reference.decrementAndGet();
-+            if (val == 0L) {
-+                final int chunkX = CoordinateUtils.getChunkX(coord);
-+                final int chunkZ = CoordinateUtils.getChunkZ(coord);
++            final int chunkX = CoordinateUtils.getChunkX(coord);
++            final int chunkZ = CoordinateUtils.getChunkZ(coord);
++
++            this.referenceCountersLock.lock();
++            boolean shouldRemove = false;
++            try {
++                final long val = reference.decrementAndGet();
++                if (val == 0L) {
++                    shouldRemove = this.referenceCounters.remove(coord, reference) == reference;
++                } else if (val < 0L) {
++                    throw new IllegalStateException("Reference count < 0: " + val);
++                }
++            }finally {
++                this.referenceCountersLock.unlock();
++            }
++
++            if (shouldRemove) {
 +                final ca.spottedleaf.concurrentutil.lock.ReentrantAreaLock.Node ticketLock = this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.lock(chunkX, chunkZ);
 +                try {
-+                    if (this.referenceCounters.remove(coord, reference) == reference) {
-+                        WorldRegionTaskData.this.removeTicket(coord);
-+                    } // else: race condition, something replaced our reference - not our issue anymore
++                    WorldRegionTaskData.this.removeTicket(coord);
 +                } finally {
 +                    this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.unlock(ticketLock);
 +                }
-+            } else if (val < 0L) {
-+                throw new IllegalStateException("Reference count < 0: " + val);
 +            }
-+
 +        }
 +
 +        private AtomicLong luminolReplaced$incrementReference(final long coord){
 +            final AtomicLong result;
 +
-+            // slow acquire
 +            final int chunkX = CoordinateUtils.getChunkX(coord);
 +            final int chunkZ = CoordinateUtils.getChunkZ(coord);
 +
 +            final boolean processTicketUpdates;
 +
-+            final ca.spottedleaf.concurrentutil.lock.ReentrantAreaLock.Node ticketLock = this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.lock(chunkX, chunkZ);
++            final AtomicLong replace = new AtomicLong(1L);
++            boolean addTicket = false;
++
++            this.referenceCountersLock.lock();
 +            try {
-+                final AtomicLong replace = new AtomicLong(1L);
 +                final AtomicLong valueInMap = this.referenceCounters.putIfAbsent(coord, replace);
 +
 +                if (valueInMap == null) {
-+                    // replaced, we should usually be here
-+                    this.addTicket(coord);
 +                    result = replace;
++                    addTicket = true;
 +                    processTicketUpdates = true;
-+                } else {
++                }else {
 +                    processTicketUpdates = false;
-+                    int failures = 0;
-+                    for (long curr = valueInMap.get();;) {
-+                        if (curr == 0L) {
-+                            // don't need to add ticket here, since ticket is only removed during the lock
-+                            // we just need to replace the value in the map so that the thread removing fails and doesn't
-+                            // remove the ticket (see decrementReference)
-+                            this.referenceCounters.put(coord, replace);
-+                            result = replace;
-+                            break;
-+                        }
++                    valueInMap.getAndIncrement();
++                    result = valueInMap;
++                }
++            }finally {
++                this.referenceCountersLock.unlock();
++            }
 +
-+                        for (int i = 0; i < failures; ++i) {
-+                            ConcurrentUtil.backoff();
-+                        }
-+
-+                        if (curr == (curr = valueInMap.compareAndExchange(curr, curr + 1L))) {
-+                            // acquired
-+                            result = valueInMap;
-+                            break;
-+                        }
-+
-+                        ++failures;
-+                    }
++            final ca.spottedleaf.concurrentutil.lock.ReentrantAreaLock.Node ticketLock = this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.lock(chunkX, chunkZ);
++            try {
++                if (addTicket) {
++                    this.addTicket(coord);
 +                }
 +            } finally {
 +                this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.unlock(ticketLock);
@@ -156,7 +154,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..75a5d32c9b9f0d75c768dbf65cd081f6
          private AtomicLong incrementReference(final long coord) {
              final AtomicLong ret = this.referenceCounters.get(coord);
              if (ret != null) {
-@@ -428,7 +547,13 @@ public final class RegionizedTaskQueue {
+@@ -428,7 +545,13 @@ public final class RegionizedTaskQueue {
              try {
                  task.executeInternal();
              } finally {
@@ -171,7 +169,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..75a5d32c9b9f0d75c768dbf65cd081f6
              }
  
              return true;
-@@ -449,6 +574,13 @@ public final class RegionizedTaskQueue {
+@@ -449,6 +572,13 @@ public final class RegionizedTaskQueue {
              private Runnable run;
              private volatile PrioritisedExecutor.Priority priority;
              private static final VarHandle PRIORITY_HANDLE = ConcurrentUtil.getVarHandle(ChunkBasedPriorityTask.class, "priority", PrioritisedExecutor.Priority.class);
@@ -185,7 +183,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..75a5d32c9b9f0d75c768dbf65cd081f6
  
              ChunkBasedPriorityTask(final WorldRegionTaskData world, final int chunkX, final int chunkZ, final boolean isChunkTask,
                                     final Runnable run, final PrioritisedExecutor.Priority priority) {
-@@ -533,7 +665,13 @@ public final class RegionizedTaskQueue {
+@@ -533,7 +663,13 @@ public final class RegionizedTaskQueue {
                          }
                      } finally {
                          if (curr != REFERENCE_COUNTER_NOT_SET) {
@@ -200,7 +198,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..75a5d32c9b9f0d75c768dbf65cd081f6
                          }
                      }
  
-@@ -547,10 +685,16 @@ public final class RegionizedTaskQueue {
+@@ -547,10 +683,16 @@ public final class RegionizedTaskQueue {
                      return false;
                  }
  
@@ -219,7 +217,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..75a5d32c9b9f0d75c768dbf65cd081f6
                      return false;
                  }
  
-@@ -574,6 +718,11 @@ public final class RegionizedTaskQueue {
+@@ -574,6 +716,11 @@ public final class RegionizedTaskQueue {
                          // the task never could be polled from the queue, so we return false
                          // don't decrement reference count, as we were certainly cancelled by another thread, which
                          // will decrement the reference count
@@ -231,7 +229,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..75a5d32c9b9f0d75c768dbf65cd081f6
                          return false;
                      }
  
-@@ -584,6 +733,9 @@ public final class RegionizedTaskQueue {
+@@ -584,6 +731,9 @@ public final class RegionizedTaskQueue {
                          // we were cancelled
                          // don't decrement reference count, as we were certainly cancelled by another thread, which
                          // will decrement the reference count
