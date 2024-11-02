@@ -5,7 +5,7 @@ Subject: [PATCH] Add experimental config for folia scheduling issue fixing
 
 
 diff --git a/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java b/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
-index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00d13f4fcc 100644
+index a1e1782d87403ca8934d37361be7ba66ddba133f..e668bfca306385fab7344bea8e9655a1f02814e1 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
 @@ -48,8 +48,29 @@ public final class RegionizedTaskQueue {
@@ -72,7 +72,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00
          return ret;
      }
  
-@@ -136,6 +178,81 @@ public final class RegionizedTaskQueue {
+@@ -136,6 +178,78 @@ public final class RegionizedTaskQueue {
              }
          }
  
@@ -115,7 +115,6 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00
 +            final boolean processTicketUpdates;
 +
 +            final AtomicLong replace = new AtomicLong(1L);
-+            boolean addTicket = false;
 +
 +            this.referenceCountersLock.lock();
 +            try {
@@ -123,7 +122,6 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00
 +
 +                if (valueInMap == null) {
 +                    result = replace;
-+                    addTicket = true;
 +                    processTicketUpdates = true;
 +                }else {
 +                    processTicketUpdates = false;
@@ -134,17 +132,16 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00
 +                this.referenceCountersLock.unlock();
 +            }
 +
-+            final ca.spottedleaf.concurrentutil.lock.ReentrantAreaLock.Node ticketLock = this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.lock(chunkX, chunkZ);
-+            try {
-+                if (addTicket) {
-+                    this.addTicket(coord);
-+                }
-+            } finally {
-+                this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.unlock(ticketLock);
-+            }
-+
 +            if (processTicketUpdates) {
-+                this.processTicketUpdates(coord);
++                // Add the ticket so that we could create the tickregion
++                final ca.spottedleaf.concurrentutil.lock.ReentrantAreaLock.Node ticketLock = this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.lock(chunkX, chunkZ);
++                try {
++                    this.addTicket(coord);
++                } finally {
++                    this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.unlock(ticketLock);
++                }
++
++                this.processTicketUpdates(coord); // Notify an update
 +            }
 +
 +            return result;
@@ -154,7 +151,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00
          private AtomicLong incrementReference(final long coord) {
              final AtomicLong ret = this.referenceCounters.get(coord);
              if (ret != null) {
-@@ -428,7 +545,13 @@ public final class RegionizedTaskQueue {
+@@ -428,7 +542,13 @@ public final class RegionizedTaskQueue {
              try {
                  task.executeInternal();
              } finally {
@@ -169,7 +166,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00
              }
  
              return true;
-@@ -449,6 +572,13 @@ public final class RegionizedTaskQueue {
+@@ -449,6 +569,13 @@ public final class RegionizedTaskQueue {
              private Runnable run;
              private volatile PrioritisedExecutor.Priority priority;
              private static final VarHandle PRIORITY_HANDLE = ConcurrentUtil.getVarHandle(ChunkBasedPriorityTask.class, "priority", PrioritisedExecutor.Priority.class);
@@ -183,7 +180,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00
  
              ChunkBasedPriorityTask(final WorldRegionTaskData world, final int chunkX, final int chunkZ, final boolean isChunkTask,
                                     final Runnable run, final PrioritisedExecutor.Priority priority) {
-@@ -533,7 +663,13 @@ public final class RegionizedTaskQueue {
+@@ -533,7 +660,13 @@ public final class RegionizedTaskQueue {
                          }
                      } finally {
                          if (curr != REFERENCE_COUNTER_NOT_SET) {
@@ -198,7 +195,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00
                          }
                      }
  
-@@ -547,10 +683,16 @@ public final class RegionizedTaskQueue {
+@@ -547,10 +680,16 @@ public final class RegionizedTaskQueue {
                      return false;
                  }
  
@@ -217,7 +214,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00
                      return false;
                  }
  
-@@ -574,6 +716,11 @@ public final class RegionizedTaskQueue {
+@@ -574,6 +713,11 @@ public final class RegionizedTaskQueue {
                          // the task never could be polled from the queue, so we return false
                          // don't decrement reference count, as we were certainly cancelled by another thread, which
                          // will decrement the reference count
@@ -229,7 +226,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..8177cd855c7529ab0740877045835c00
                          return false;
                      }
  
-@@ -584,6 +731,9 @@ public final class RegionizedTaskQueue {
+@@ -584,6 +728,9 @@ public final class RegionizedTaskQueue {
                          // we were cancelled
                          // don't decrement reference count, as we were certainly cancelled by another thread, which
                          // will decrement the reference count
