@@ -4,179 +4,11 @@ Date: Wed, 18 Sep 2024 23:10:47 +0800
 Subject: [PATCH] Add experimental config for folia scheduling issue fixing
 
 
-diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java
-index 085d035b5d127d14af6b8487bee5446b814bc590..f79129ff781f4f30d31b7b15de5df9dc05060299 100644
---- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java
-+++ b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java
-@@ -851,6 +851,29 @@ public final class ChunkTaskScheduler {
-         return MinecraftServer.getServer().regionizedServer.taskQueue.createChunkTask(this.world, chunkX, chunkZ, run, priority); // Folia - regionised ticking
-     }
- 
-+    // Luminol start
-+    public PrioritisedExecutor.PrioritisedTask createScheduledChunkTask(final int chunkX, final int chunkZ, final Runnable run,
-+                                                               final PrioritisedExecutor.Priority priority) {
-+        PrioritisedExecutor.PrioritisedTask created = MinecraftServer.getServer().regionizedServer.taskQueue.createChunkTask(this.world, chunkX, chunkZ, run, priority, true);
-+
-+        boolean result;
-+        for (;;) {
-+            try {
-+                result = created.queue();
-+            }catch (me.earthme.luminol.utils.TaskCancelledException ignored) {
-+                return created;
-+            }
-+
-+            if (result) {
-+                return created;
-+            }
-+
-+            created = MinecraftServer.getServer().regionizedServer.taskQueue.createChunkTask(this.world, chunkX, chunkZ, run, priority, true);
-+        }
-+    }
-+    // Luminol end
-+
-+
-     public PrioritisedExecutor.PrioritisedTask scheduleChunkTask(final int chunkX, final int chunkZ, final Runnable run) {
-         return this.scheduleChunkTask(chunkX, chunkZ, run, PrioritisedExecutor.Priority.NORMAL);
-     }
-diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/ChunkFullTask.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/ChunkFullTask.java
-index 8581b8771b8cc89ff7bdb63fbfd5628a1e7d4762..f0b053ba78b0e847499c99863984c6d52b5f024c 100644
---- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/ChunkFullTask.java
-+++ b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/ChunkFullTask.java
-@@ -26,7 +26,8 @@ public final class ChunkFullTask extends ChunkProgressionTask implements Runnabl
- 
-     private final NewChunkHolder chunkHolder;
-     private final ChunkAccess fromChunk;
--    private final PrioritisedExecutor.PrioritisedTask convertToFullTask;
-+    private PrioritisedExecutor.PrioritisedTask convertToFullTask; // Luminol
-+    private final PrioritisedExecutor.Priority priority; // Luminol
- 
-     public static final io.papermc.paper.util.IntervalledCounter chunkLoads = new io.papermc.paper.util.IntervalledCounter(java.util.concurrent.TimeUnit.SECONDS.toNanos(15L));
-     public static final io.papermc.paper.util.IntervalledCounter chunkGenerates = new io.papermc.paper.util.IntervalledCounter(java.util.concurrent.TimeUnit.SECONDS.toNanos(15L));
-@@ -37,6 +38,7 @@ public final class ChunkFullTask extends ChunkProgressionTask implements Runnabl
-         this.chunkHolder = chunkHolder;
-         this.fromChunk = fromChunk;
-         this.convertToFullTask = scheduler.createChunkTask(chunkX, chunkZ, this, priority);
-+        this.priority = priority; // Luminol
-     }
- 
-     @Override
-@@ -129,7 +131,12 @@ public final class ChunkFullTask extends ChunkProgressionTask implements Runnabl
-         if ((boolean)SCHEDULED_HANDLE.getAndSet((ChunkFullTask)this, true)) {
-             throw new IllegalStateException("Cannot double call schedule()");
-         }
--        this.convertToFullTask.queue();
-+        boolean queued = this.convertToFullTask.queue(); // Luminol
-+        // Luminol start
-+        if (!queued && me.earthme.luminol.config.modules.experiment.FoliaTaskQueueFixConfig.enabled) {
-+            this.convertToFullTask = scheduler.createScheduledChunkTask(this.chunkX, this.chunkZ, this, this.priority);
-+        }
-+        // Luminol end
-     }
- 
-     @Override
-diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask.java
-index 7a65d351b448873c6f2c145c975c92be314b876c..8a403cbb17a5c94bb09104a7d236f008f78d0a8d 100644
---- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask.java
-+++ b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask.java
-@@ -41,13 +41,15 @@ public abstract class GenericDataLoadTask<OnMain,FinalCompletion> {
-     // processing off-main
-     protected final PrioritisedExecutor.PrioritisedTask processOffMain;
-     // processing on-main
--    protected final PrioritisedExecutor.PrioritisedTask processOnMain;
-+    protected PrioritisedExecutor.PrioritisedTask processOnMain; // Luminol
- 
-     protected final ChunkTaskScheduler scheduler;
-     protected final ServerLevel world;
-     protected final int chunkX;
-     protected final int chunkZ;
-     protected final RegionFileIOThread.RegionFileType type;
-+    private final PrioritisedExecutor.Priority priority; // Luminol
-+    private ProcessOnMainTask mainTask; // Luminol
- 
-     public GenericDataLoadTask(final ChunkTaskScheduler scheduler, final ServerLevel world, final int chunkX,
-                                final int chunkZ, final RegionFileIOThread.RegionFileType type,
-@@ -61,6 +63,7 @@ public abstract class GenericDataLoadTask<OnMain,FinalCompletion> {
-         final ProcessOnMainTask mainTask;
-         if (this.hasOnMain()) {
-             mainTask = new ProcessOnMainTask();
-+            this.mainTask = mainTask;
-             this.processOnMain = this.createOnMain(mainTask, priority);
-         } else {
-             mainTask = null;
-@@ -81,6 +84,7 @@ public abstract class GenericDataLoadTask<OnMain,FinalCompletion> {
-         }
- 
-         this.loadDataFromDiskTask = new LoadDataFromDiskTask(world, chunkX, chunkZ, type, new DataLoadCallback(offMainTask, mainTask), priority);
-+        this.priority = priority; // Luminol
-     }
- 
-     public static final record TaskResult<L, R>(L left, R right) {}
-@@ -278,7 +282,19 @@ public abstract class GenericDataLoadTask<OnMain,FinalCompletion> {
-                     // no off-main task, so go straight to main
-                     this.onMainTask.data = (OnMain)compoundTag;
-                     this.onMainTask.throwable = throwable;
--                    GenericDataLoadTask.this.processOnMain.queue();
-+                    boolean queued = GenericDataLoadTask.this.processOnMain.queue(); // Luminol
-+
-+                    // Luminol start
-+                    if (!queued) {
-+                        if (!me.earthme.luminol.config.modules.experiment.FoliaTaskQueueFixConfig.enabled) {
-+                            return;
-+                        }
-+
-+                        if (GenericDataLoadTask.this.processOnMain instanceof io.papermc.paper.threadedregions.RegionizedTaskQueue.PrioritisedQueue.ChunkBasedPriorityTask) {
-+                            GenericDataLoadTask.this.processOnMain = scheduler.createScheduledChunkTask(GenericDataLoadTask.this.chunkX, GenericDataLoadTask.this.chunkZ, GenericDataLoadTask.this.mainTask, GenericDataLoadTask.this.priority);
-+                        }
-+                    }
-+                    // Luminol end
-                 }
-             } catch (final Throwable thr2) {
-                 LOGGER.error("Failed I/O callback for task: " + GenericDataLoadTask.this.toString(), thr2);
-@@ -327,7 +343,19 @@ public abstract class GenericDataLoadTask<OnMain,FinalCompletion> {
-                 this.schedule.data = newData.left;
-                 this.schedule.throwable = newData.right;
- 
--                GenericDataLoadTask.this.processOnMain.queue();
-+                boolean queued = GenericDataLoadTask.this.processOnMain.queue(); // Luminol
-+
-+                // Luminol start
-+                if (!queued) {
-+                    if (!me.earthme.luminol.config.modules.experiment.FoliaTaskQueueFixConfig.enabled) {
-+                        return;
-+                    }
-+
-+                    if (GenericDataLoadTask.this.processOnMain instanceof io.papermc.paper.threadedregions.RegionizedTaskQueue.PrioritisedQueue.ChunkBasedPriorityTask) {
-+                        GenericDataLoadTask.this.processOnMain = scheduler.createScheduledChunkTask(GenericDataLoadTask.this.chunkX, GenericDataLoadTask.this.chunkZ, GenericDataLoadTask.this.mainTask, GenericDataLoadTask.this.priority);
-+                    }
-+                }
-+                // Luminol end
-             } else {
-                 GenericDataLoadTask.this.onComplete((TaskResult<FinalCompletion, Throwable>)newData);
-             }
 diff --git a/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java b/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
-index a1e1782d87403ca8934d37361be7ba66ddba133f..5f8758684ff0e3ae5d78b316d045205c59aaca69 100644
+index a1e1782d87403ca8934d37361be7ba66ddba133f..e668bfca306385fab7344bea8e9655a1f02814e1 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
-@@ -21,6 +21,18 @@ public final class RegionizedTaskQueue {
- 
-     private static final TicketType<Unit> TASK_QUEUE_TICKET = TicketType.create("task_queue_ticket", (a, b) -> 0);
- 
-+    // Luminol start
-+    public PrioritisedExecutor.PrioritisedTask createChunkTask(final ServerLevel world, final int chunkX, final int chunkZ,
-+                                                               final Runnable run, boolean sft) {
-+        return new PrioritisedQueue.ChunkBasedPriorityTask(world.taskQueueRegionData, chunkX, chunkZ, true, run, PrioritisedExecutor.Priority.NORMAL, sft);
-+    }
-+
-+    public PrioritisedExecutor.PrioritisedTask createChunkTask(final ServerLevel world, final int chunkX, final int chunkZ,
-+                                                               final Runnable run, final PrioritisedExecutor.Priority priority, boolean sft) {
-+        return new PrioritisedQueue.ChunkBasedPriorityTask(world.taskQueueRegionData, chunkX, chunkZ, true, run, priority, sft);
-+    }
-+    // Luminol end
-+
-     public PrioritisedExecutor.PrioritisedTask createChunkTask(final ServerLevel world, final int chunkX, final int chunkZ,
-                                                                final Runnable run) {
-         return new PrioritisedQueue.ChunkBasedPriorityTask(world.taskQueueRegionData, chunkX, chunkZ, true, run, PrioritisedExecutor.Priority.NORMAL);
-@@ -48,8 +60,29 @@ public final class RegionizedTaskQueue {
+@@ -48,8 +48,29 @@ public final class RegionizedTaskQueue {
  
      public PrioritisedExecutor.PrioritisedTask queueChunkTask(final ServerLevel world, final int chunkX, final int chunkZ,
                                                                final Runnable run, final PrioritisedExecutor.Priority priority) {
@@ -208,7 +40,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..5f8758684ff0e3ae5d78b316d045205c
          return ret;
      }
  
-@@ -60,8 +93,29 @@ public final class RegionizedTaskQueue {
+@@ -60,8 +81,29 @@ public final class RegionizedTaskQueue {
  
      public PrioritisedExecutor.PrioritisedTask queueTickTaskQueue(final ServerLevel world, final int chunkX, final int chunkZ,
                                                                    final Runnable run, final PrioritisedExecutor.Priority priority) {
@@ -240,7 +72,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..5f8758684ff0e3ae5d78b316d045205c
          return ret;
      }
  
-@@ -136,6 +190,78 @@ public final class RegionizedTaskQueue {
+@@ -136,6 +178,78 @@ public final class RegionizedTaskQueue {
              }
          }
  
@@ -319,16 +151,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..5f8758684ff0e3ae5d78b316d045205c
          private AtomicLong incrementReference(final long coord) {
              final AtomicLong ret = this.referenceCounters.get(coord);
              if (ret != null) {
-@@ -271,7 +397,7 @@ public final class RegionizedTaskQueue {
-         }
-     }
- 
--    static final class PrioritisedQueue {
-+    public static final class PrioritisedQueue { // Luminol
-         private final ArrayDeque<ChunkBasedPriorityTask>[] queues = new ArrayDeque[PrioritisedExecutor.Priority.TOTAL_SCHEDULABLE_PRIORITIES]; {
-             for (int i = 0; i < PrioritisedExecutor.Priority.TOTAL_SCHEDULABLE_PRIORITIES; ++i) {
-                 this.queues[i] = new ArrayDeque<>();
-@@ -428,13 +554,19 @@ public final class RegionizedTaskQueue {
+@@ -428,7 +542,13 @@ public final class RegionizedTaskQueue {
              try {
                  task.executeInternal();
              } finally {
@@ -343,14 +166,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..5f8758684ff0e3ae5d78b316d045205c
              }
  
              return true;
-         }
- 
--        private static final class ChunkBasedPriorityTask implements PrioritisedExecutor.PrioritisedTask {
-+        public static final class ChunkBasedPriorityTask implements PrioritisedExecutor.PrioritisedTask { // Luminol
- 
-             private static final AtomicLong REFERENCE_COUNTER_NOT_SET = new AtomicLong(-1L);
- 
-@@ -449,6 +581,13 @@ public final class RegionizedTaskQueue {
+@@ -449,6 +569,13 @@ public final class RegionizedTaskQueue {
              private Runnable run;
              private volatile PrioritisedExecutor.Priority priority;
              private static final VarHandle PRIORITY_HANDLE = ConcurrentUtil.getVarHandle(ChunkBasedPriorityTask.class, "priority", PrioritisedExecutor.Priority.class);
@@ -364,7 +180,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..5f8758684ff0e3ae5d78b316d045205c
  
              ChunkBasedPriorityTask(final WorldRegionTaskData world, final int chunkX, final int chunkZ, final boolean isChunkTask,
                                     final Runnable run, final PrioritisedExecutor.Priority priority) {
-@@ -533,7 +672,13 @@ public final class RegionizedTaskQueue {
+@@ -533,7 +660,13 @@ public final class RegionizedTaskQueue {
                          }
                      } finally {
                          if (curr != REFERENCE_COUNTER_NOT_SET) {
@@ -379,7 +195,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..5f8758684ff0e3ae5d78b316d045205c
                          }
                      }
  
-@@ -547,10 +692,16 @@ public final class RegionizedTaskQueue {
+@@ -547,10 +680,16 @@ public final class RegionizedTaskQueue {
                      return false;
                  }
  
@@ -398,7 +214,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..5f8758684ff0e3ae5d78b316d045205c
                      return false;
                  }
  
-@@ -574,6 +725,11 @@ public final class RegionizedTaskQueue {
+@@ -574,6 +713,11 @@ public final class RegionizedTaskQueue {
                          // the task never could be polled from the queue, so we return false
                          // don't decrement reference count, as we were certainly cancelled by another thread, which
                          // will decrement the reference count
@@ -410,7 +226,7 @@ index a1e1782d87403ca8934d37361be7ba66ddba133f..5f8758684ff0e3ae5d78b316d045205c
                          return false;
                      }
  
-@@ -584,6 +740,9 @@ public final class RegionizedTaskQueue {
+@@ -584,6 +728,9 @@ public final class RegionizedTaskQueue {
                          // we were cancelled
                          // don't decrement reference count, as we were certainly cancelled by another thread, which
                          // will decrement the reference count
