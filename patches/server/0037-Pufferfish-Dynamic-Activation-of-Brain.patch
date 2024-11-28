@@ -71,7 +71,7 @@ index 0000000000000000000000000000000000000000..af5893ba1f738ec9827d7b714682c314
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index b5cb700e2cd1de2f78ad582245208c056fa6fa79..80123dd30328336b02a5e2e3414ece44ba040ad2 100644
+index 94d855f14c91ca164f1728be1df4e83dfed8b005..3ebea71bbc6ced0d0a325c519436a0199666fafb 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -805,6 +805,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
@@ -83,7 +83,7 @@ index b5cb700e2cd1de2f78ad582245208c056fa6fa79..80123dd30328336b02a5e2e3414ece44
                      if (false && this.shouldDiscardEntity(entity)) { // CraftBukkit - We prevent spawning in general, so this butchering is not needed
                          entity.discard();
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index d68328d4c429d4fc95c19e9477d0795beba2f53f..ff729667384bc07746f4bfa3fe18d09547cc86a2 100644
+index 261bcb9cbb8bda07037f40883ddc5381948c66e1..6497ecce4a826776c487e0e2fcb077f21e02ecda 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -430,6 +430,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -346,7 +346,7 @@ index 91728a992a29bc22e46a260750d5dd88e629bfd1..3f4e4b612e127e51b240bca8776f6fc3
          if (this.assignProfessionWhenSpawned) {
              this.assignProfessionWhenSpawned = false;
 diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
-index 96103d7c380e095c06876da00bd4132ae9598671..4e8892326bfadfb0f1baf672908bc282f11103b1 100644
+index 2d26c8109cb942d1856455fd0239290ee1142eb3..c17e9782850fd88b9a46d31bf9075624ffc11709 100644
 --- a/src/main/java/org/spigotmc/ActivationRange.java
 +++ b/src/main/java/org/spigotmc/ActivationRange.java
 @@ -38,6 +38,10 @@ import co.aikar.timings.MinecraftTimings;

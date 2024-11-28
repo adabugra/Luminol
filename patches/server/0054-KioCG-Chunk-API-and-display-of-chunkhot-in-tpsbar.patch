@@ -179,7 +179,7 @@ index 026807e0851d67c6d57e81f573ac1bf8fedc6109..c45f6bd60d1cf7a915aa6ceea07c0929
          if (mspt == -1){
              return BossBar.Color.valueOf(TpsBarConfig.tpsColors.get(3));
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index abe3dbe11066469f030e4f7381f98d38537443d4..870036b5f0d2eea249591b45a8f1071382652440 100644
+index 29103346dd3e5e69de260c95051c9447fda0da41..93cc0a7562dce407b486007a9dd33652d2b75b90 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1715,6 +1715,29 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
