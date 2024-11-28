@@ -33,7 +33,7 @@
 ```kotlin
 repositories {
     maven {
-        url = "http://maven.nostal.ink/repository/maven-snapshots/"
+        url = "https://maven.nostal.ink/repository/maven-snapshots/"
     }
 }
 
@@ -48,7 +48,7 @@ dependencies {
 <repositories>
     <repository>
         <id>nostal</id>
-        <url>http://maven.nostal.ink/repository/maven-snapshots/</url>
+        <url>https://maven.nostal.ink/repository/maven-snapshots/</url>
     </repository>
 </repositories>
 
