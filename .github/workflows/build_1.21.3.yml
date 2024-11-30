@@ -1,0 +1,72 @@
+name: Luminol CI - dev/1.21.3
+
+on:
+    push:
+      branches: [ "dev/1.21.3" ]
+    pull_request:
+      branches: [ "de/1.21.3" ]
+
+permissions: write-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: default
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.7
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - name: Configure Git User Details
+        run: git config --global user.email "ci@luminolmc.com" && git config --global user.name "LuminolMC CI"
+      - name: Apply Patches
+        run: gradle applyPatches
+      - name: CreateJar
+        run: gradle createMojmapBundlerJar createMojmapPaperclipJar
+      - name: Publish to repo
+        run: |
+          export MAVEN_REPO_USER=${{ secrets.MAVEN_REPO_USER }}
+          export MAVEN_REPO_PASSWORD=${{ secrets.MAVEN_REPO_PASSWORD }}
+          ./gradlew publish -PpublishDevBundle=true
+      - name: SetENV
+        run: sh scripts/SetENV.sh
+      - name: Upload Artifact
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "${{ env.project_id_b }} CI Artifacts"
+          path: "build/libs/*.jar"
+      - name: Create Release
+        if: "!contains(github.event.commits[0].message, '[release skip]')"
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          tag: ${{ env.tag }}
+          name: ${{ env.project_id_b }} ${{ env.mcversion }} - ${{ env.commit_id }}
+          body: |
+            📦Version: `${{ env.mcversion }}` | Commit ${{ env.commit_id }} [![download](https://img.shields.io/github/downloads/LuminolMC/${{ env.project_id }}/${{ env.tag }}/total?color=red&style=flat-square)](https://github.com/LuminolMC/${{ env.project_id }}/download/${{ env.tag }}/${{ env.jar }})
+            This release is automatically compiled by GitHub Actions
+            ### Commit Message
+            ${{ env.commit_msg }}
+          artifacts: |
+            ${{ env.jar_dir }}
+            ${{ env.jar_dir_bundler }}
+          generateReleaseNotes: true
+          prerelease: ${{ env.pre }}
+          makeLatest: ${{ env.make_latest }}
+          token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Push to API
+        if: "!contains(github.event.commits[0].message, '[release skip]')"
+        continue-on-error: true
+        env:
+          secret_v2: ${{ secrets.API_KEY }}
+          tag: ${{ env.tag }}
+          project_id: ${{ env.project_id }}
+        run: sh scripts/PushToAPI.sh
