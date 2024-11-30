@@ -18,7 +18,7 @@ index 48604e7f96adc9e226e034054c5e2bad0b024eb5..99f0c1e4d3437154a1062b0a8f94b7a0
              return;
          }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 3e0fab30defa9bd92919219d47af02287364157e..e1db537d97cc29005c6a06f86611f2c0513f2c0e 100644
+index 3e0fab30defa9bd92919219d47af02287364157e..d54b5a0c4efd25d2792ab0ff69985eab663ab253 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -808,8 +808,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -69,6 +69,24 @@ index 3e0fab30defa9bd92919219d47af02287364157e..e1db537d97cc29005c6a06f86611f2c0
                  return;
              }
          }
+@@ -1771,7 +1772,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         };
+         // Folia end - region threading
+ 
+-        this.server.spark.tickStart(); // Paper - spark
++        if (false) this.server.spark.tickStart(); // Paper - spark // Luminol - Force disable builtin spark
+         new com.destroystokyo.paper.event.server.ServerTickStartEvent((int)region.getCurrentTick()).callEvent(); // Paper - Server Tick Events // Folia - region threading
+         // Folia start - region threading
+         if (region != null) {
+@@ -1842,7 +1843,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         long remaining = scheduledEnd - endTime; // Folia - region ticking
+         new com.destroystokyo.paper.event.server.ServerTickEndEvent((int)io.papermc.paper.threadedregions.RegionizedServer.getCurrentTick(), ((double)(endTime - startTime) / 1000000D), remaining).callEvent(); // Folia - region ticking
+         // Paper end - Server Tick Events
+-        this.server.spark.tickEnd(((double)(endTime - startTime) / 1000000D)); // Paper - spark // Folia - region ticking
++        if (false) this.server.spark.tickEnd(((double)(endTime - startTime) / 1000000D)); // Paper - spark // Folia - region ticking // Luminol - Force disable builtin spark
+         gameprofilerfiller.push("tallying");
+         // Folia - region threading
+         gameprofilerfiller.pop();
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 index 295504dab771c8bb8c668545fe5d62eae0561b76..49b4ef6457743b5f955bff70694378d4975e44a7 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
