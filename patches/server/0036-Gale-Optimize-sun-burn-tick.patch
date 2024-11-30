@@ -5,10 +5,10 @@ Subject: [PATCH] Gale Optimize sun burn tick
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 6497ecce4a826776c487e0e2fcb077f21e02ecda..9b87aa41f03056721757348151b1119016421650 100644
+index 8d0aae7ae8abec5eac1357a1ea28df0cddab2f36..537187df8f400f8625216b0fc21cd19c3bf28e85 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -315,7 +315,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -274,7 +274,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      public double xo;
      public double yo;
      public double zo;
@@ -17,7 +17,7 @@ index 6497ecce4a826776c487e0e2fcb077f21e02ecda..9b87aa41f03056721757348151b11190
      private BlockPos blockPosition;
      private ChunkPos chunkPosition;
      private Vec3 deltaMovement;
-@@ -2124,9 +2124,19 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2204,9 +2204,19 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      /** @deprecated */
      @Deprecated
      public float getLightLevelDependentMagicValue() {
@@ -39,10 +39,10 @@ index 6497ecce4a826776c487e0e2fcb077f21e02ecda..9b87aa41f03056721757348151b11190
          this.absMoveTo(x, y, z);
          this.absRotateTo(yaw, pitch);
 diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
-index 84281b92b2c02c70702d43ebcf7afa85914e03fb..bc20ef314b20de38412522edcab99aaa4ba9ac32 100644
+index 8082fb0d0793743ee6123f4bb5c6d79b078d5f86..0e0b971c93cdfd8cfae8019c4710f72fdd096c6a 100644
 --- a/src/main/java/net/minecraft/world/entity/Mob.java
 +++ b/src/main/java/net/minecraft/world/entity/Mob.java
-@@ -1778,13 +1778,29 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+@@ -1766,13 +1766,29 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
  
      protected void playAttackSound() {}
  

@@ -1,22 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Paul Sauve <paul@technove.co>
-Date: Mon, 26 Apr 2021 10:52:56 -0500
+From: MrHua269 <wangxyper@163.com>
+Date: Sat, 30 Nov 2024 11:52:43 +0800
 Subject: [PATCH] Pufferfish Cache climbing check for activation
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index 9b8fd458c851d72901568845d973330ed58260a9..33ecd65a2787741cc0611ad3100a1bf9d2ce0338 100644
+index b63393c131f736cd51666c675ac18918e038eca6..f9a4ba5cc7c1029a5201e140c80648d07ca80936 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-@@ -157,7 +157,6 @@ import org.bukkit.event.entity.EntityTeleportEvent;
- import org.bukkit.event.player.PlayerItemConsumeEvent;
- // CraftBukkit end
- 
--import co.aikar.timings.MinecraftTimings; // Paper
- 
- public abstract class LivingEntity extends Entity implements Attackable {
- 
-@@ -2084,6 +2083,20 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -2139,6 +2139,20 @@ public abstract class LivingEntity extends Entity implements Attackable {
          return this.lastClimbablePos;
      }
  
@@ -38,10 +30,10 @@ index 9b8fd458c851d72901568845d973330ed58260a9..33ecd65a2787741cc0611ad3100a1bf9
          if (this.isSpectator()) {
              return false;
 diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
-index d12f9586602769bd0c692f1cf5820b008cb4bc51..2d26c8109cb942d1856455fd0239290ee1142eb3 100644
+index f2f5eb1a443ac411539e1c87eec60e76682b82fa..cbe785f5fab22630e8a80519664791e2ac621b9f 100644
 --- a/src/main/java/org/spigotmc/ActivationRange.java
 +++ b/src/main/java/org/spigotmc/ActivationRange.java
-@@ -307,7 +307,7 @@ public class ActivationRange
+@@ -304,7 +304,7 @@ public class ActivationRange
          if ( entity instanceof LivingEntity )
          {
              LivingEntity living = (LivingEntity) entity;

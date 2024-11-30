@@ -203,7 +203,7 @@ index 0000000000000000000000000000000000000000..349618b7f544bf9a30e0796d4d9a2640
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/util/BitStorage.java b/src/main/java/net/minecraft/util/BitStorage.java
-index 19661e106612b8e4e152085fb398db7bd06acc23..4fd45dc4dca29ac5f0be3b02d8ce17127bdc38cf 100644
+index e4e153cb8899e70273aa150b8ea26907cf68b15c..6bfd2ff3318085b0204bb4235ba9f3df2e981087 100644
 --- a/src/main/java/net/minecraft/util/BitStorage.java
 +++ b/src/main/java/net/minecraft/util/BitStorage.java
 @@ -21,6 +21,8 @@ public interface BitStorage extends ca.spottedleaf.moonrise.patches.block_counti
@@ -216,10 +216,10 @@ index 19661e106612b8e4e152085fb398db7bd06acc23..4fd45dc4dca29ac5f0be3b02d8ce1712
      // provide default impl in case mods implement this...
      @Override
 diff --git a/src/main/java/net/minecraft/util/SimpleBitStorage.java b/src/main/java/net/minecraft/util/SimpleBitStorage.java
-index 8acf2f2491a8d9d13392c5e89b2bd5c9918285e1..5ff7b2c9d97cb428b7a3a54bd53ab385afe92ce1 100644
+index d99ec470b4653beab630999a5b2c1a6428b20c38..f8640b8cce9018d877ec69bbba241d5d9e89b8d8 100644
 --- a/src/main/java/net/minecraft/util/SimpleBitStorage.java
 +++ b/src/main/java/net/minecraft/util/SimpleBitStorage.java
-@@ -401,4 +401,45 @@ public class SimpleBitStorage implements BitStorage {
+@@ -472,4 +472,45 @@ public class SimpleBitStorage implements BitStorage {
              super(message);
          }
      }
@@ -266,7 +266,7 @@ index 8acf2f2491a8d9d13392c5e89b2bd5c9918285e1..5ff7b2c9d97cb428b7a3a54bd53ab385
 +
  }
 diff --git a/src/main/java/net/minecraft/util/ZeroBitStorage.java b/src/main/java/net/minecraft/util/ZeroBitStorage.java
-index 15c5164d0ef41a978c16ee317fa73e97f2480207..60ffd244d5e1c528d908ee9a5dd2d8907a30bb24 100644
+index 1f9c436a632e4f110be61cf76fcfc3b7eb80334e..3e57421c045851413998e4e181793c739419c85a 100644
 --- a/src/main/java/net/minecraft/util/ZeroBitStorage.java
 +++ b/src/main/java/net/minecraft/util/ZeroBitStorage.java
 @@ -12,6 +12,8 @@ public class ZeroBitStorage implements BitStorage {
@@ -290,7 +290,7 @@ index acae3eb30e0689048937f479dc3070f0688abdad..4b79f0474a9013dd4fdb68c6363ca194
      int onResize(int newBits, T object);
  }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java b/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
-index 13d3c877b006a4975e7370713e3919c661e7890f..a2e0c9df771483904ffeaf6ef3bd3ab4b189fdb3 100644
+index 8b84bf2272556ac3321cbf16361d7f48a1cc6873..8dd0813c6b00badf38a0d7f08572e8f68b4034be 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
 @@ -25,6 +25,22 @@ import net.minecraft.util.ThreadingDetector;
@@ -316,7 +316,7 @@ index 13d3c877b006a4975e7370713e3919c661e7890f..a2e0c9df771483904ffeaf6ef3bd3ab4
      private static final int MIN_PALETTE_BITS = 0;
      private final PaletteResize<T> dummyPaletteResize = (newSize, added) -> 0;
      public final IdMap<T> registry;
-@@ -304,28 +320,54 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
+@@ -348,28 +364,54 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
      public synchronized PalettedContainerRO.PackedData<T> pack(IdMap<T> idList, PalettedContainer.Strategy paletteProvider) { // Paper - synchronize
          this.acquire();
  
@@ -386,7 +386,7 @@ index 13d3c877b006a4975e7370713e3919c661e7890f..a2e0c9df771483904ffeaf6ef3bd3ab4
      }
  
      private static <T> void swapPalette(int[] is, IntUnaryOperator applier) {
-@@ -364,13 +406,33 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
+@@ -409,13 +451,33 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
  
      @Override
      public void count(PalettedContainer.CountConsumer<T> counter) {

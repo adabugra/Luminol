@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
-Date: Wed, 31 Jul 2024 13:38:04 +0800
+Date: Sat, 30 Nov 2024 12:13:26 +0800
 Subject: [PATCH] Gale Skip entity move if movement is zero
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 9b87aa41f03056721757348151b1119016421650..e20533b2ab9f39fc942271b704d644fb382376f7 100644
+index 537187df8f400f8625216b0fc21cd19c3bf28e85..75182b1f12ed5ad0ff541aee28b40a72b783230d 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -324,6 +324,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -283,6 +283,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      public float yRotO;
      public float xRotO;
      private AABB bb;
@@ -16,10 +16,10 @@ index 9b87aa41f03056721757348151b1119016421650..e20533b2ab9f39fc942271b704d644fb
      public boolean onGround;
      public boolean horizontalCollision;
      public boolean verticalCollision;
-@@ -1139,6 +1140,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1181,6 +1182,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      //Luminol end
  
-     public void move(MoverType movementType, Vec3 movement) {
+     public void move(MoverType type, Vec3 movement) {
 +        // Gale start - VMP - skip entity move if movement is zero
 +        if (!this.boundingBoxChanged && movement.equals(Vec3.ZERO)) {
 +            return;
@@ -28,7 +28,7 @@ index 9b87aa41f03056721757348151b1119016421650..e20533b2ab9f39fc942271b704d644fb
          final Vec3 originalMovement = movement; // Paper - Expose pre-collision velocity
          // Paper start - detailed watchdog information
          ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread("Cannot move an entity off-main");
-@@ -4981,6 +4987,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -5245,6 +5251,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
  
      public final void setBoundingBox(AABB boundingBox) {

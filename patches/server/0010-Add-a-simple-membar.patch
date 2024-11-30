@@ -306,10 +306,10 @@ index 0000000000000000000000000000000000000000..47809d78392fe0cb30ad68ca1c331784
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 690d0f59daf8c4630c3d70b6fb690c2e1cedd402..8bd9baba560051e681277b8cea9d1374ea3ee825 100644
+index 279bc6eede3a1ae77b810f0553efe36adeeefaa4..4ff5105d32c41a8ea145e7833ea6a3cee0108031 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -856,6 +856,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -803,6 +803,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
      @Override
      public void stopServer() {
          me.earthme.luminol.functions.GlobalServerTpsBar.cancelBarUpdateTask(); //Luminol - Tpsbar
@@ -318,10 +318,10 @@ index 690d0f59daf8c4630c3d70b6fb690c2e1cedd402..8bd9baba560051e681277b8cea9d1374
          //Util.shutdownExecutors(); // Paper - moved into super
          SkullBlockEntity.clear();
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 59a4937363a2404fe0b852b0ac851ef0c9c528ce..023ffc81f9363eb2fc7c3b3382c843b064c889e3 100644
+index 8148cbbea2de545e538ce81b51de3919ba11ef59..3f4518b29c9f0c4ad9561bde2ffded8404608cae 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -304,6 +304,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -330,6 +330,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      public @Nullable String clientBrandName = null; // Paper - Brand support
      public org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
      public volatile boolean isTpsBarVisible = false; //Luminol - Tps bar
@@ -330,10 +330,10 @@ index 59a4937363a2404fe0b852b0ac851ef0c9c528ce..023ffc81f9363eb2fc7c3b3382c843b0
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
      private final ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder viewDistanceHolder = new ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder();
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index b954a5a3d8c589a0261202f21f1430c8790e874a..77576c06ffc0a677b1bfb63d48d39fba2aa2050d 100644
+index 5eb2432cb0a43afee70be081a8e05aaf35de4859..566c404acfced53414f3d0facd22d03b71841587 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2396,6 +2396,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2408,6 +2408,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
              //Luminol start - Tpsbar
              getHandle().isTpsBarVisible = data.getBoolean("tpsbarVisible");
              //Luminol end
@@ -343,7 +343,7 @@ index b954a5a3d8c589a0261202f21f1430c8790e874a..77576c06ffc0a677b1bfb63d48d39fba
          }
      }
  
-@@ -2420,6 +2423,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2432,6 +2435,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          //Luminol start - Tpsbar
          data.putBoolean("tpsbarVisible",handle.isTpsBarVisible);
          //Luminol end

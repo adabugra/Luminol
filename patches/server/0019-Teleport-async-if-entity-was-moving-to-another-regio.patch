@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: MrHua269 <novau233@163.com>
-Date: Wed, 7 Feb 2024 06:34:15 +0000
+From: MrHua269 <wangxyper@163.com>
+Date: Sat, 30 Nov 2024 11:36:43 +0800
 Subject: [PATCH] Teleport async if entity was moving to another region at once
 
 
@@ -39,10 +39,10 @@ index 0000000000000000000000000000000000000000..0e51d465db3554ac80d00c6b85cc1f01
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 537fc5c169ab2e519277b95d456aab51b5b7fbb5..25a5f36ff19ff3f9cea051a1a6bf671b6288b799 100644
+index d98a86e911c6b6bc181d5148e806e2452cb1c6f4..403585b38a2d8bc1e25fa8e3e4014470a65461b9 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -1125,6 +1125,10 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1173,6 +1173,10 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
      // Paper end - detailed watchdog information
  
@@ -50,10 +50,10 @@ index 537fc5c169ab2e519277b95d456aab51b5b7fbb5..25a5f36ff19ff3f9cea051a1a6bf671b
 +    private volatile boolean preventMoving = false;
 +    //Luminol end
 +
-     public void move(MoverType movementType, Vec3 movement) {
+     public void move(MoverType type, Vec3 movement) {
          final Vec3 originalMovement = movement; // Paper - Expose pre-collision velocity
          // Paper start - detailed watchdog information
-@@ -1135,6 +1139,32 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1183,6 +1187,32 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
              this.moveStartZ = this.getZ();
              this.moveVector = movement;
          }

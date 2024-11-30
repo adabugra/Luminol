@@ -1,21 +1,21 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
-Date: Wed, 31 Jul 2024 11:49:53 +0800
+Date: Sat, 30 Nov 2024 11:22:17 +0800
 Subject: [PATCH] Empty config file base
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index de5a43db5f0c7c507c492db8789ad2d4a4cff3c8..f657ee64810d1c02a967b9262b95fbc65eb3fce2 100644
+index 623816729867d0bee60075c00334e2011795049a..fcc16a93482527b364c8ba1da5cb659b35fdfd4e 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -14,6 +14,7 @@ val alsoShade: Configuration by configurations.creating
+@@ -26,6 +26,7 @@ abstract class MockitoAgentProvider : CommandLineArgumentProvider {
  
  dependencies {
      implementation(project(":luminol-api")) // Folia // Luminol
 +    implementation("com.electronwill.night-config:toml:3.6.6") // Luminol - Night config
      // Paper start
-     implementation("org.jline:jline-terminal-jansi:3.21.0")
-     implementation("net.minecrell:terminalconsoleappender:1.3.0")
+     implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
+     implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
 diff --git a/src/main/java/me/earthme/luminol/commands/LuminolConfigCommand.java b/src/main/java/me/earthme/luminol/commands/LuminolConfigCommand.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..5c8745dffa80cf47e856d04d283937bda86881f8
@@ -576,10 +576,10 @@ index 0000000000000000000000000000000000000000..de94c8e39f0ae0da80d5a79af63413e2
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 301d7fa29fce2997a5881b3852896eff5af33672..0755e8f460f59e2dbc00cac73026bb441c04e9ea 100644
+index 78f33298e809a7f6d079d9f2c64e2caa47a1b25a..e3c8deea68ef49bcd07359e243a12afb57cbcf52 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -226,6 +226,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -223,6 +223,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
          this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
          // Paper end - initialize global and world-defaults configuration

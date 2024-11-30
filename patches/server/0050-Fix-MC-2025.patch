@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
-Date: Wed, 31 Jul 2024 14:51:16 +0800
+Date: Sat, 30 Nov 2024 12:33:04 +0800
 Subject: [PATCH] Fix-MC-2025
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 7c54abc8480b4184dc3712f02bd2ae2189ac0cc8..2fa5029aa058a7dd8641013b0626a4b5083cdaec 100644
+index e2b7daa6a9af849b49e75a4329b53cca559d1ea9..e560cf681642252e381a71f5abe8fd2572b163ed 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -2625,6 +2625,16 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2751,6 +2751,16 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  nbttagcompound.putBoolean("Paper.FreezeLock", true);
              }
              // Paper end
@@ -25,7 +25,7 @@ index 7c54abc8480b4184dc3712f02bd2ae2189ac0cc8..2fa5029aa058a7dd8641013b0626a4b5
              return nbttagcompound;
          } catch (Throwable throwable) {
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Saving entity NBT");
-@@ -2702,6 +2712,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2829,6 +2839,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                          this.reapplyPosition();
                      }
  

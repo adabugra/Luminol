@@ -31,10 +31,10 @@ index 0000000000000000000000000000000000000000..acc032f727e605e79b688efb4873ff47
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
-index 121e9cbeb07a41febac0086f5fce5a172a4ad15e..84281b92b2c02c70702d43ebcf7afa85914e03fb 100644
+index 34500f330f51e4c2c7b2b99ba57b0574ee3b266d..8082fb0d0793743ee6123f4bb5c6d79b078d5f86 100644
 --- a/src/main/java/net/minecraft/world/entity/Mob.java
 +++ b/src/main/java/net/minecraft/world/entity/Mob.java
-@@ -240,11 +240,13 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+@@ -243,11 +243,13 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
          return this.lookControl;
      }
  

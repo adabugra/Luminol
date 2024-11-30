@@ -31,10 +31,10 @@ index 0000000000000000000000000000000000000000..6235ff18455a21695bdc2d65367558d3
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/item/MapItem.java b/src/main/java/net/minecraft/world/item/MapItem.java
-index e96f15814986109e5e947c7b3b210be6e56ba0ed..31354cbf344c222a8e6e892091ea30d81b8b2706 100644
+index 58f3c9598301a5b34142ddf958aa7a4db634be3d..c002b449688981c192468fb210e8fd9ef3f91553 100644
 --- a/src/main/java/net/minecraft/world/item/MapItem.java
 +++ b/src/main/java/net/minecraft/world/item/MapItem.java
-@@ -281,7 +281,7 @@ public class MapItem extends ComplexItem {
+@@ -280,7 +280,7 @@ public class MapItem extends Item {
                      mapItemSavedData.tickCarriedBy(player, stack);
                  }
  

@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
-Date: Wed, 31 Jul 2024 14:50:23 +0800
+Date: Sat, 30 Nov 2024 12:31:48 +0800
 Subject: [PATCH] Threaded region start tick and finished tick event
 
 
 diff --git a/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java b/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java
-index 4bfa83a6683970657eaaaaa265855f0d2e79a3a9..6bbc9a0fb94980cd201d7ddb7cb440fcee7786f4 100644
+index 056fb1ca7b07d5e713dcbd951830b14fc9025f4c..b67a76347f06686d684215c89259e764f8dd1604 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java
-@@ -442,7 +442,7 @@ public final class TickRegionScheduler {
+@@ -401,7 +401,7 @@ public final class TickRegionScheduler {
  
              final long scheduledStart = this.getScheduledStart();
              final long scheduledEnd = scheduledStart + TIME_BETWEEN_TICKS;
@@ -17,7 +17,7 @@ index 4bfa83a6683970657eaaaaa265855f0d2e79a3a9..6bbc9a0fb94980cd201d7ddb7cb440fc
              synchronized (this) {
                  this.currentTickData = new TickTime(
                      lastTickStart, scheduledStart, tickStart, cpuStart,
-@@ -477,6 +477,7 @@ public final class TickRegionScheduler {
+@@ -436,6 +436,7 @@ public final class TickRegionScheduler {
                  );
  
                  this.addTickTime(time);

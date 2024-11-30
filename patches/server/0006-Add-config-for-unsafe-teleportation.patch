@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
-Date: Fri, 25 Oct 2024 00:05:33 +0800
+Date: Sat, 30 Nov 2024 11:26:36 +0800
 Subject: [PATCH] Add config for unsafe teleportation
 
 
@@ -31,7 +31,7 @@ index 0000000000000000000000000000000000000000..ea374875f529b30db17e8b8cb07b99a6
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
-index 5d6b1a63a2a213f8a4e81c5e574847007a82007b..77ff2a526a1d2b9307dfc696f9862bfda7407475 100644
+index 8203bc134888a57056a6cb301beb9ff21983716f..cac7453f83be82671fb21c8712ff190b234a6ae0 100644
 --- a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
 @@ -69,7 +69,7 @@ public class FallingBlockEntity extends Entity {
@@ -43,9 +43,9 @@ index 5d6b1a63a2a213f8a4e81c5e574847007a82007b..77ff2a526a1d2b9307dfc696f9862bfd
      protected static final EntityDataAccessor<BlockPos> DATA_START_POS = SynchedEntityData.defineId(FallingBlockEntity.class, EntityDataSerializers.BLOCK_POS);
      public boolean autoExpire = true; // Paper - Expand FallingBlock API
  
-@@ -419,7 +419,7 @@ public class FallingBlockEntity extends Entity {
+@@ -435,7 +435,7 @@ public class FallingBlockEntity extends Entity {
          boolean flag = (resourcekey1 == Level.END || resourcekey == Level.END) && resourcekey1 != resourcekey;
-         Entity entity = super.changeDimension(teleportTarget);
+         Entity entity = super.teleport(teleportTarget);
  
 -        this.forceTickAfterTeleportToDuplicate = entity != null && flag && io.papermc.paper.configuration.GlobalConfiguration.get().unsupportedSettings.allowUnsafeEndPortalTeleportation; // Paper
 +        this.forceTickAfterTeleportToDuplicate = entity != null && flag && (io.papermc.paper.configuration.GlobalConfiguration.get().unsupportedSettings.allowUnsafeEndPortalTeleportation || me.earthme.luminol.config.modules.fixes.UnsafeTeleportationConfig.enabled); // Paper // Luminol - Unsafe teleportation
@@ -53,10 +53,10 @@ index 5d6b1a63a2a213f8a4e81c5e574847007a82007b..77ff2a526a1d2b9307dfc696f9862bfd
      }
  }
 diff --git a/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java b/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
-index e1c071e0b25c4678bf08313b6c60cf895a54aa02..13c3527cd4852356ce8f39c739d1c5015ef69b16 100644
+index 403cced72fa043a9084afb5bb8fa037ccb511d41..f8e40758e6aed473a06cce18f20e727e44a06436 100644
 --- a/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
-@@ -71,7 +71,11 @@ public class EndPortalBlock extends BaseEntityBlock implements Portal {
+@@ -76,7 +76,11 @@ public class EndPortalBlock extends BaseEntityBlock implements Portal {
              if (event.isCancelled()) return; // Paper - make cancellable
              // CraftBukkit end
              // Folia - region threading - do not show credits

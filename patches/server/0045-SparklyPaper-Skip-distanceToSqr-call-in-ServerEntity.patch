@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrHua269 <wangxyper@163.com>
+Date: Sun, 4 Aug 2024 22:29:01 +0800
+Subject: [PATCH] SparklyPaper Skip "distanceToSqr" call in
+ "ServerEntity#sendChanges" if the delta movement hasn't changed
+
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
+index 90eb4927fa51ce3df86aa7b6c71f49150a03e337..f4590eb0eef02a425056e73e7dc71328b8a5f773 100644
+--- a/src/main/java/net/minecraft/server/level/ServerEntity.java
++++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
+@@ -230,6 +230,8 @@ public class ServerEntity {
+ 
+                     if ((this.trackDelta || this.entity.hasImpulse || this.entity instanceof LivingEntity && ((LivingEntity) this.entity).isFallFlying()) && this.tickCount > 0) {
+                         Vec3 vec3d1 = this.entity.getDeltaMovement();
++
++                    if (vec3d1 != this.lastSentMovement) { // SparklyPaper start - skip distanceToSqr call in ServerEntity#sendChanges if the delta movement hasn't changed
+                         double d0 = vec3d1.distanceToSqr(this.lastSentMovement);
+ 
+                         if (d0 > 1.0E-7D || d0 > 0.0D && vec3d1.lengthSqr() == 0.0D) {
+@@ -244,6 +246,7 @@ public class ServerEntity {
+                                 this.broadcast.accept(new ClientboundSetEntityMotionPacket(this.entity.getId(), this.lastSentMovement));
+                             }
+                         }
++                    } // SparklyPaper end
+                     }
+ 
+                     if (packet1 != null) {

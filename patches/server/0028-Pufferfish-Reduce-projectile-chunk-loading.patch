@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: MrHua269 <novau233@163.com>
-Date: Wed, 7 Feb 2024 05:45:24 +0000
+From: MrHua269 <wangxyper@163.com>
+Date: Sat, 30 Nov 2024 11:54:58 +0800
 Subject: [PATCH] Pufferfish Reduce projectile chunk loading
 
 
@@ -33,10 +33,10 @@ index 0000000000000000000000000000000000000000..12683ec5a5102e45b6171fea0b833ba5
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
-index 0e831070fe7a9ac58de4b25b74a53b38334c695a..2f0a40134ef2fcccf407a5381994c3454040097e 100644
+index 522fa33311b433f8c0eff4cb10dd80128f3c96d7..3a832be7d14276f38f1a35ca9f9a540be7b7d1b4 100644
 --- a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
 +++ b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
-@@ -52,6 +52,40 @@ public abstract class Projectile extends Entity implements TraceableEntity {
+@@ -58,6 +58,40 @@ public abstract class Projectile extends Entity implements TraceableEntity {
          super(type, world);
      }
  
