@@ -234,10 +234,10 @@ index d54b5a0c4efd25d2792ab0ff69985eab663ab253..90f4e67daa58088d06f61f005acf2a67
          final ProfilerFiller profiler = Profiler.get();
          int playerSaveInterval = io.papermc.paper.configuration.GlobalConfiguration.get().playerAutoSave.rate;
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 87c0f0551aeedbc7924f83242886cfe4f8a8b63a..377844d109411b43b28ece71bc714702e012621e 100644
+index 230b448d8dd5c49e2cd45d9f06a439912402d914..0eba44f94da54716e94f00b919124eedbed53514 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -1372,6 +1372,8 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1381,6 +1381,8 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
          final int timerId = isActive ? entity.getType().tickTimerId : entity.getType().inactiveTickTimerId;
          final ca.spottedleaf.leafprofiler.RegionizedProfiler.Handle profiler = io.papermc.paper.threadedregions.TickRegionScheduler.getProfiler();
          profiler.startTimer(timerId);
@@ -246,7 +246,7 @@ index 87c0f0551aeedbc7924f83242886cfe4f8a8b63a..377844d109411b43b28ece71bc714702
          try {
          // Folia end - profiler
          if (isActive) { // Paper - EAR 2
-@@ -1389,6 +1391,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1398,6 +1400,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
          } else { entity.inactiveTick(); } // Paper - EAR 2
          gameprofilerfiller.pop();
          } finally { profiler.stopTimer(timerId); } // Folia - timer
@@ -254,7 +254,7 @@ index 87c0f0551aeedbc7924f83242886cfe4f8a8b63a..377844d109411b43b28ece71bc714702
          Iterator iterator = entity.getPassengers().iterator();
  
          while (iterator.hasNext()) {
-@@ -1411,6 +1414,8 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1420,6 +1423,8 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
                  final int timerId = isActive ? passenger.getType().tickTimerId : passenger.getType().inactiveTickTimerId;
                  final ca.spottedleaf.leafprofiler.RegionizedProfiler.Handle profiler = io.papermc.paper.threadedregions.TickRegionScheduler.getProfiler();
                  profiler.startTimer(timerId);
@@ -263,7 +263,7 @@ index 87c0f0551aeedbc7924f83242886cfe4f8a8b63a..377844d109411b43b28ece71bc714702
                  try {
                  // Folia end - profiler
                  passenger.setOldPosAndRot();
-@@ -1451,6 +1456,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1460,6 +1465,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
                  }
  
                  } finally { profiler.stopTimer(timerId); } // Folia - profiler
