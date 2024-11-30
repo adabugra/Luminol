@@ -33,6 +33,7 @@ jobs:
       - name: CreateJar
         run: gradle createMojmapBundlerJar createMojmapPaperclipJar
       - name: Publish to repo
+        continue-on-error: true
         run: |
           export MAVEN_REPO_USER=${{ secrets.MAVEN_REPO_USER }}
           export MAVEN_REPO_PASSWORD=${{ secrets.MAVEN_REPO_PASSWORD }}
