@@ -33,12 +33,12 @@
 ```kotlin
 repositories {
     maven {
-        url = "https://maven.nostal.ink/repository/maven-snapshots/"
+        url = "https://maven.moliatopia.icu/repository/maven-snapshots/"
     }
 }
 
 dependencies {
-    compileOnly("me.earthme.luminol:luminol-api:1.21.1-R0.1-20241001.135225-1")
+    compileOnly("me.earthme.luminol:luminol-api:1.21.3-R0.1-20241201.004037-1")
 }
  ```
 
@@ -47,8 +47,8 @@ dependencies {
 ```xml
 <repositories>
     <repository>
-        <id>nostal</id>
-        <url>https://maven.nostal.ink/repository/maven-snapshots/</url>
+        <id>moliatopia</id>
+        <url>https://maven.moliatopia.icu/repository/maven-snapshots/</url>
     </repository>
 </repositories>
 
@@ -56,7 +56,7 @@ dependencies {
     <dependency>
         <groupId>me.earthme.luminol</groupId>
         <artifactId>luminol-api</artifactId>
-        <version>1.21.1-R0.1-20241001.135225-1</version>
+        <version>1.21.3-R0.1-20241201.004037-1</version>
     </dependency>
 </dependencies>
 ```
