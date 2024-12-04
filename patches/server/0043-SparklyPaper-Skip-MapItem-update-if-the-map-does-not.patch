@@ -31,7 +31,7 @@ index 0000000000000000000000000000000000000000..6235ff18455a21695bdc2d65367558d3
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/item/MapItem.java b/src/main/java/net/minecraft/world/item/MapItem.java
-index 58f3c9598301a5b34142ddf958aa7a4db634be3d..c002b449688981c192468fb210e8fd9ef3f91553 100644
+index 65d1af43b8bc740a9dc77dd8d5ba99de000fe57a..d2df220bb9d8b567314696582b71f86359e6ce6a 100644
 --- a/src/main/java/net/minecraft/world/item/MapItem.java
 +++ b/src/main/java/net/minecraft/world/item/MapItem.java
 @@ -280,7 +280,7 @@ public class MapItem extends Item {

@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
-Date: Sun, 4 Aug 2024 21:41:52 +0800
+Date: Wed, 4 Dec 2024 23:50:22 +0800
 Subject: [PATCH] Pufferfish Throttle goal selector during inactive ticking
 
 
@@ -31,10 +31,10 @@ index 0000000000000000000000000000000000000000..acc032f727e605e79b688efb4873ff47
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
-index 34500f330f51e4c2c7b2b99ba57b0574ee3b266d..8082fb0d0793743ee6123f4bb5c6d79b078d5f86 100644
+index d5a205ecb5bd52d37ba867d7542b53331623cb5a..05d11b562e12c1d22df39856b32b3049c50d06b6 100644
 --- a/src/main/java/net/minecraft/world/entity/Mob.java
 +++ b/src/main/java/net/minecraft/world/entity/Mob.java
-@@ -243,11 +243,13 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+@@ -231,11 +231,13 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
          return this.lookControl;
      }
  

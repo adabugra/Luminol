@@ -318,10 +318,10 @@ index 279bc6eede3a1ae77b810f0553efe36adeeefaa4..4ff5105d32c41a8ea145e7833ea6a3ce
          //Util.shutdownExecutors(); // Paper - moved into super
          SkullBlockEntity.clear();
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 8148cbbea2de545e538ce81b51de3919ba11ef59..3f4518b29c9f0c4ad9561bde2ffded8404608cae 100644
+index 3eded95f44f2d421f23a6daf4550240b8646f070..e58e754534fc37f276e66cbd771d10f0d6d26706 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -330,6 +330,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -328,6 +328,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      public @Nullable String clientBrandName = null; // Paper - Brand support
      public org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
      public volatile boolean isTpsBarVisible = false; //Luminol - Tps bar
@@ -330,7 +330,7 @@ index 8148cbbea2de545e538ce81b51de3919ba11ef59..3f4518b29c9f0c4ad9561bde2ffded84
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
      private final ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder viewDistanceHolder = new ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder();
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 5eb2432cb0a43afee70be081a8e05aaf35de4859..566c404acfced53414f3d0facd22d03b71841587 100644
+index 7a585ce7ed7e489f0186a0a7c2370e0c439e3710..c8bdb67cf7e94523a6e6942cb552221be37482d4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -2408,6 +2408,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {

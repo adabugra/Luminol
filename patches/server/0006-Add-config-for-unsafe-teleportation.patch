@@ -31,7 +31,7 @@ index 0000000000000000000000000000000000000000..ea374875f529b30db17e8b8cb07b99a6
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
-index 8203bc134888a57056a6cb301beb9ff21983716f..cac7453f83be82671fb21c8712ff190b234a6ae0 100644
+index a498cdbe42df3161c35b2a1652dfa63693366bd6..76e8eca1229430742c6c2557d481fb98c570a8bc 100644
 --- a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
 @@ -69,7 +69,7 @@ public class FallingBlockEntity extends Entity {
@@ -43,7 +43,7 @@ index 8203bc134888a57056a6cb301beb9ff21983716f..cac7453f83be82671fb21c8712ff190b
      protected static final EntityDataAccessor<BlockPos> DATA_START_POS = SynchedEntityData.defineId(FallingBlockEntity.class, EntityDataSerializers.BLOCK_POS);
      public boolean autoExpire = true; // Paper - Expand FallingBlock API
  
-@@ -435,7 +435,7 @@ public class FallingBlockEntity extends Entity {
+@@ -430,7 +430,7 @@ public class FallingBlockEntity extends Entity {
          boolean flag = (resourcekey1 == Level.END || resourcekey == Level.END) && resourcekey1 != resourcekey;
          Entity entity = super.teleport(teleportTarget);
  
@@ -53,7 +53,7 @@ index 8203bc134888a57056a6cb301beb9ff21983716f..cac7453f83be82671fb21c8712ff190b
      }
  }
 diff --git a/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java b/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
-index 403cced72fa043a9084afb5bb8fa037ccb511d41..f8e40758e6aed473a06cce18f20e727e44a06436 100644
+index 45b8ac1418864ea32bd625b0d57fcec288ea5b0c..96dfc7062c2b0d371717c2042bf7c8e8b32e8716 100644
 --- a/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
 @@ -76,7 +76,11 @@ public class EndPortalBlock extends BaseEntityBlock implements Portal {

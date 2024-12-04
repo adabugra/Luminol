@@ -5,10 +5,10 @@ Subject: [PATCH] Rebrand to Luminol
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index a4b74fabc9f5a57c8897794e69855f2f3f82f986..623816729867d0bee60075c00334e2011795049a 100644
+index dd6cc4972a209e58313a2b6c6fe87c3605fe34ae..17d2d18d7898e4f0898cc18c930b7cb26f826f2a 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -99,14 +99,14 @@ tasks.jar {
+@@ -100,14 +100,14 @@ tasks.jar {
          val gitBranch = git("rev-parse", "--abbrev-ref", "HEAD").getText().trim() // Paper
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
