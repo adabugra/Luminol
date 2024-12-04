@@ -5,7 +5,7 @@ Subject: [PATCH] Add config to disable async catchers
 
 
 diff --git a/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java b/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java
-index 7d626bec6f0a4497026de6c0311e27cf95cfd757..2760e66046a37327d279a5bcdfb56a5b073b82a5 100644
+index 301cc1c0d91f5e755f74ace60dbe5551240b496d..2befb04b18cbdcc854437dfc534832ae02e70ee6 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java
 +++ b/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java
 @@ -26,49 +26,49 @@ public class TickThread extends Thread {

@@ -31,7 +31,7 @@ index 0000000000000000000000000000000000000000..3eafc59cc015569d3da8b1d8c4bfd046
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/level/BaseCommandBlock.java b/src/main/java/net/minecraft/world/level/BaseCommandBlock.java
-index b8a571fcc44f67ac8f6089e039a8620bf6c40603..c973535eba031f102c6cae8f9b75547ba3a95376 100644
+index ccf476d1ed22cf992e3cbca6a375d36f85a82fa8..81f69938ccc72522090c4bee1a941c0de8054feb 100644
 --- a/src/main/java/net/minecraft/world/level/BaseCommandBlock.java
 +++ b/src/main/java/net/minecraft/world/level/BaseCommandBlock.java
 @@ -117,7 +117,7 @@ public abstract class BaseCommandBlock implements CommandSource {

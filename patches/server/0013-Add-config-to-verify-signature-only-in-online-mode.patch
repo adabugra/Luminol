@@ -32,7 +32,7 @@ index 0000000000000000000000000000000000000000..e45ce3abf49684c911678abcefd69586
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/player/ProfilePublicKey.java b/src/main/java/net/minecraft/world/entity/player/ProfilePublicKey.java
-index 2fa51c3a70f43cd23b8f494fc643d66cecfda7d2..2c541f300ea1657e2d75d0eeb36809aaf437b205 100644
+index 6a7d7fad990fc44fdda6849d43dad141e61f7f37..dd470577fe314154b5a3677851eef95ebd151721 100644
 --- a/src/main/java/net/minecraft/world/entity/player/ProfilePublicKey.java
 +++ b/src/main/java/net/minecraft/world/entity/player/ProfilePublicKey.java
 @@ -9,12 +9,15 @@ import java.time.Duration;
