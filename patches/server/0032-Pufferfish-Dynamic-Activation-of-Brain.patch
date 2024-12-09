@@ -83,7 +83,7 @@ index 5503d506c595296ecad09a3ce4497a365f216af5..98aef7a3cfc759e4415df3a56b5fe01e
                      if (!tickratemanager.isEntityFrozen(entity)) {
                          gameprofilerfiller.push("checkDespawn");
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index ea45436e27f3d6c831d3e5fc11587e5e185304e0..88a6896afe118a7ea8092fac36e163b534715344 100644
+index 1651a6ba49d0683cd505251fdcdc5a2fd29725c3..4e1ffa09617ec1cec7117264d7d665e17eead4b8 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -390,6 +390,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -108,7 +108,7 @@ index 635c9c7a8c8307c2bc845a8e1f24aacb526a3c92..c824e8a540dccffd848ae0a0624ce034
      private Component description;
      private final Optional<ResourceKey<LootTable>> lootTable;
 diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
-index 4f5048b8b892fa5bd4132fbd74d3b404f2795ad6..d5a205ecb5bd52d37ba867d7542b53331623cb5a 100644
+index 6b66d73daa0145829cd964403e7958335ef0aa9a..80756e96faed0e0ca239f58f63522b9f15822c07 100644
 --- a/src/main/java/net/minecraft/world/entity/Mob.java
 +++ b/src/main/java/net/minecraft/world/entity/Mob.java
 @@ -235,10 +235,10 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
@@ -124,7 +124,7 @@ index 4f5048b8b892fa5bd4132fbd74d3b404f2795ad6..d5a205ecb5bd52d37ba867d7542b5333
              this.targetSelector.tick();
          }
      }
-@@ -937,16 +937,20 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+@@ -939,16 +939,20 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
  
          if (i % 2 != 0 && this.tickCount > 1) {
              gameprofilerfiller.push("targetSelector");

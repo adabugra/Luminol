@@ -29,10 +29,10 @@ index dd6cc4972a209e58313a2b6c6fe87c3605fe34ae..17d2d18d7898e4f0898cc18c930b7cb2
              "Build-Time" to Instant.now().toString(),
              "Git-Branch" to gitBranch, // Paper
 diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/com/destroystokyo/paper/Metrics.java
-index cb60d58d4a7556dd896f31d0cd249f860bb3ef84..b52a805150e95d7d27403d3c18088b335a355011 100644
+index f5ff71e31516327be71924926938f1c9f0e503df..1ea251a202dc6386a110ee515d3329902f14e08e 100644
 --- a/src/main/java/com/destroystokyo/paper/Metrics.java
 +++ b/src/main/java/com/destroystokyo/paper/Metrics.java
-@@ -593,7 +593,7 @@ public class Metrics {
+@@ -592,7 +592,7 @@ public class Metrics {
              boolean logFailedRequests = config.getBoolean("logFailedRequests", false);
              // Only start Metrics, if it's enabled in the config
              if (config.getBoolean("enabled", true)) {
@@ -41,7 +41,7 @@ index cb60d58d4a7556dd896f31d0cd249f860bb3ef84..b52a805150e95d7d27403d3c18088b33
  
                  metrics.addCustomChart(new Metrics.SimplePie("minecraft_version", () -> {
                      String minecraftVersion = Bukkit.getVersion();
-@@ -611,7 +611,7 @@ public class Metrics {
+@@ -610,7 +610,7 @@ public class Metrics {
                  } else {
                      paperVersion = "unknown";
                  }

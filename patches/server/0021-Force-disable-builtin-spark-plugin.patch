@@ -18,7 +18,7 @@ index 48604e7f96adc9e226e034054c5e2bad0b024eb5..99f0c1e4d3437154a1062b0a8f94b7a0
              return;
          }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index a99a275655ec8374c62cecbf00df6cddab00d6b9..67245811b15d6dfc0626e1d6ca874a901e565c3c 100644
+index 8cc0c01a19fc71753d7c3ed4fa7e9992aaf93b5a..1c052f730d834187c6645dd9530c8a6e7879b3d3 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -809,8 +809,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -41,16 +41,16 @@ index a99a275655ec8374c62cecbf00df6cddab00d6b9..67245811b15d6dfc0626e1d6ca874a90
              this.server.disablePlugins();
              this.server.waitForAsyncTasksShutdown(); // Paper - Wait for Async Tasks during shutdown
          }
-@@ -1346,7 +1346,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-             // tasks are default scheduled at -1 + delay, and first tick will tick at 1
-             final long actualDoneTimeMs = System.currentTimeMillis() - org.bukkit.craftbukkit.Main.BOOT_TIME.toEpochMilli(); // Paper - Add total time
-             LOGGER.info("Done ({})! For help, type \"help\"", String.format(java.util.Locale.ROOT, "%.3fs", actualDoneTimeMs / 1000.00D)); // Paper - Add total time
+@@ -1323,7 +1323,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             this.statusIcon = (ServerStatus.Favicon) this.loadStatusIcon().orElse(null); // CraftBukkit - decompile error
+             this.status = this.buildServerStatus();
+ 
 -            this.server.spark.enableBeforePlugins(); // Paper - spark
 +            if (false) this.server.spark.enableBeforePlugins(); // Paper - spark // Luminol - Force disable builtin spark
-             org.spigotmc.WatchdogThread.tick();
-             // Paper end - Improved Watchdog Support
-             org.spigotmc.WatchdogThread.hasStarted = true; // Paper
-@@ -1729,7 +1729,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             // Folia start - region threading
+             if (true) {
+                 io.papermc.paper.threadedregions.RegionizedServer.getInstance().init(); // Folia - region threading - only after loading worlds
+@@ -1728,7 +1728,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              }
  
              if (this.emptyTicks >= j) {
@@ -59,7 +59,7 @@ index a99a275655ec8374c62cecbf00df6cddab00d6b9..67245811b15d6dfc0626e1d6ca874a90
                  if (this.emptyTicks == j) {
                      MinecraftServer.LOGGER.info("Server empty for {} seconds, pausing", this.pauseWhileEmptySeconds());
                      this.autoSave();
-@@ -1748,7 +1748,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1747,7 +1747,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  // Paper end - avoid issues with certain tasks not processing during sleep
                  // Folia - region threading
                  this.tickConnection();
@@ -69,7 +69,7 @@ index a99a275655ec8374c62cecbf00df6cddab00d6b9..67245811b15d6dfc0626e1d6ca874a90
                  return;
              }
          }
-@@ -1773,7 +1774,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1772,7 +1773,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          };
          // Folia end - region threading
  
@@ -78,7 +78,7 @@ index a99a275655ec8374c62cecbf00df6cddab00d6b9..67245811b15d6dfc0626e1d6ca874a90
          new com.destroystokyo.paper.event.server.ServerTickStartEvent((int)region.getCurrentTick()).callEvent(); // Paper - Server Tick Events // Folia - region threading
          // Folia start - region threading
          if (region != null) {
-@@ -1844,7 +1845,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1843,7 +1844,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          long remaining = scheduledEnd - endTime; // Folia - region ticking
          new com.destroystokyo.paper.event.server.ServerTickEndEvent((int)io.papermc.paper.threadedregions.RegionizedServer.getCurrentTick(), ((double)(endTime - startTime) / 1000000D), remaining).callEvent(); // Folia - region ticking
          // Paper end - Server Tick Events
@@ -110,7 +110,7 @@ index 295504dab771c8bb8c668545fe5d62eae0561b76..49b4ef6457743b5f955bff70694378d4
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index a8975cee866cf2c617b6d4976df71e5c20cf0e3d..ac180d082b05f2a5fa557b49e3d34e81e4957766 100644
+index 567e12e24ece2cd823b73e7337b10eb89995da21..20cf4ce4f73f681bdbe092d4693812800c953be9 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -312,7 +312,7 @@ public final class CraftServer implements Server {
