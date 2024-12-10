@@ -4,6 +4,21 @@ Date: Wed, 7 Feb 2024 04:50:10 +0000
 Subject: [PATCH] Add config for username check
 
 
+diff --git a/src/main/java/com/destroystokyo/paper/profile/CraftPlayerProfile.java b/src/main/java/com/destroystokyo/paper/profile/CraftPlayerProfile.java
+index 8849862b45ccbbc635a1c316e9870bca81e55c04..774521cf327592adeef67f3fb8f6334e0b7de799 100644
+--- a/src/main/java/com/destroystokyo/paper/profile/CraftPlayerProfile.java
++++ b/src/main/java/com/destroystokyo/paper/profile/CraftPlayerProfile.java
+@@ -294,8 +294,8 @@ public class CraftPlayerProfile implements PlayerProfile, SharedPlayerProfile {
+     }
+ 
+     private static GameProfile createAuthLibProfile(UUID uniqueId, String name) {
+-        Preconditions.checkArgument(name == null || name.length() <= 16, "Name cannot be longer than 16 characters");
+-        Preconditions.checkArgument(name == null || StringUtil.isValidPlayerName(name), "The name of the profile contains invalid characters: %s", name);
++        Preconditions.checkArgument(name == null || name.length() <= 16 || !me.earthme.luminol.config.modules.misc.UsernameCheckConfig.enabled, "Name cannot be longer than 16 characters");
++        Preconditions.checkArgument(name == null || StringUtil.isValidPlayerName(name) ||  !me.earthme.luminol.config.modules.misc.UsernameCheckConfig.enabled, "The name of the profile contains invalid characters: %s", name);
+         return new GameProfile(
+             uniqueId != null ? uniqueId : Util.NIL_UUID,
+             name != null ? name : ""
 diff --git a/src/main/java/me/earthme/luminol/config/modules/misc/UsernameCheckConfig.java b/src/main/java/me/earthme/luminol/config/modules/misc/UsernameCheckConfig.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..c7e4724cc4ab8d911bcaf0106c098b266c843bb1
