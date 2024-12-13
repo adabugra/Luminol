@@ -332,7 +332,7 @@ index 921527acc8624536f4a48e9fdf7fce370bc52c77..497de02dce0f397ce261b4d62777e11f
 +    // KioCG end
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 160952e149bc5582a946b96e1456e595e86216f8..24ce9cafb098d11611afba3fa3441d85e8c60c49 100644
+index 3b2bce1b5261a0efbbfcd7d38bf7f093d97df3a6..2d9f75526240689facba1a4fbef7d40ef8299a1d 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -6236,4 +6236,6 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -503,10 +503,10 @@ index c2bffe3450ee9f768e00a23ec09df74d7a06d49b..4791e013e8257f57b5db6f974dc05829
 +    // KioCG end
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 5bbca5e97347c6a077cda3cb663f6890e7b5dbba..1513b8ab2647abe082f15904562e267b42006121 100644
+index bf9cf758c7aef50d34e2017665b6d3f4125228f5..7cb4389e1a03655d00cd19ad43019c5ff14785f9 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3588,4 +3588,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3596,4 +3596,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          this.getHandle().connection.send(new net.minecraft.network.protocol.game.ClientboundEntityEventPacket(((CraftEntity) target).getHandle(), effect.getData()));
      }
      // Paper end - entity effect API

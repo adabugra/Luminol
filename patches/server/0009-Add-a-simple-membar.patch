@@ -330,10 +330,10 @@ index 0752d13febc5f1831ae58f7216fba89e1290c780..93c038ba1fd216fd11ab8b5cec580745
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
      private final ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder viewDistanceHolder = new ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder();
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index b0bb884ec35945ecb56ad486ef29ac64d4ece873..8bcb931863dd844a38769f75ec87431547f07258 100644
+index c39e9ea1ce46864623a6d15027ce337611e6b712..1872b19dfefb40e6673fd2b8ddb8d3c384020073 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2409,6 +2409,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2417,6 +2417,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
              //Luminol start - Tpsbar
              getHandle().isTpsBarVisible = data.getBoolean("tpsbarVisible");
              //Luminol end
@@ -343,7 +343,7 @@ index b0bb884ec35945ecb56ad486ef29ac64d4ece873..8bcb931863dd844a38769f75ec874315
          }
      }
  
-@@ -2433,6 +2436,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2441,6 +2444,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          //Luminol start - Tpsbar
          data.putBoolean("tpsbarVisible",handle.isTpsBarVisible);
          //Luminol end
