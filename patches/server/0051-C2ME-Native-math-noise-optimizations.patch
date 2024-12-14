@@ -140,7 +140,7 @@ index 0000000000000000000000000000000000000000..e94fbc2afcca53465889822eee41e9df
 +}
 diff --git a/src/main/java/com/ishland/c2me/opts/natives_math/common/BindingsTemplate.java b/src/main/java/com/ishland/c2me/opts/natives_math/common/BindingsTemplate.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..015487ba22ac953e4612bef900d876e8cadc3e2e
+index 0000000000000000000000000000000000000000..703ded0cbe1e2b3d2cd6076da509d8bcf4a97ef7
 --- /dev/null
 +++ b/src/main/java/com/ishland/c2me/opts/natives_math/common/BindingsTemplate.java
 @@ -0,0 +1,408 @@
@@ -172,8 +172,8 @@ index 0000000000000000000000000000000000000000..015487ba22ac953e4612bef900d876e8
 +                    ValueLayout.JAVA_DOUBLE,
 +                    ValueLayout.JAVA_DOUBLE,
 +                    ValueLayout.JAVA_DOUBLE
-+            ),
-+            Linker.Option.critical(true)
++            )//,
++            //Linker.Option.critical(true)
 +    );
 +
 +    // c2me_natives_noise_perlin_double, double, (const double_octave_sampler_data_t *data, double x, double y, double z)
@@ -184,8 +184,8 @@ index 0000000000000000000000000000000000000000..015487ba22ac953e4612bef900d876e8
 +                    ValueLayout.JAVA_DOUBLE,
 +                    ValueLayout.JAVA_DOUBLE,
 +                    ValueLayout.JAVA_DOUBLE
-+            ),
-+            Linker.Option.critical(true)
++            )//,
++            //Linker.Option.critical(true)
 +    );
 +    public static final MethodHandle c2me_natives_noise_perlin_double_ptr = NativeLoader.linker.downcallHandle(
 +            FunctionDescriptor.of(
@@ -194,8 +194,8 @@ index 0000000000000000000000000000000000000000..015487ba22ac953e4612bef900d876e8
 +                    ValueLayout.JAVA_DOUBLE,
 +                    ValueLayout.JAVA_DOUBLE,
 +                    ValueLayout.JAVA_DOUBLE
-+            ),
-+            Linker.Option.critical(true)
++            )//,
++            //Linker.Option.critical(true)
 +    );
 +
 +    // c2me_natives_noise_perlin_double_batch, void, (const double_octave_sampler_data_t *const data,
@@ -210,8 +210,8 @@ index 0000000000000000000000000000000000000000..015487ba22ac953e4612bef900d876e8
 +                    ValueLayout.ADDRESS,
 +                    ValueLayout.ADDRESS,
 +                    ValueLayout.JAVA_INT
-+            ),
-+            Linker.Option.critical(true)
++            )//,
++            //Linker.Option.critical(true)
 +    );
 +    public static final MethodHandle c2me_natives_noise_perlin_double_batch_ptr = NativeLoader.linker.downcallHandle(
 +            FunctionDescriptor.ofVoid(
@@ -221,8 +221,8 @@ index 0000000000000000000000000000000000000000..015487ba22ac953e4612bef900d876e8
 +                    ValueLayout.ADDRESS,
 +                    ValueLayout.ADDRESS,
 +                    ValueLayout.JAVA_INT
-+            ),
-+            Linker.Option.critical(true)
++            )//,
++            //Linker.Option.critical(true)
 +    );
 +
 +
@@ -329,8 +329,8 @@ index 0000000000000000000000000000000000000000..015487ba22ac953e4612bef900d876e8
 +                    ValueLayout.JAVA_DOUBLE,
 +                    ValueLayout.JAVA_DOUBLE,
 +                    ValueLayout.JAVA_DOUBLE
-+            ),
-+            Linker.Option.critical(true)
++            )//,
++            //Linker.Option.critical(true)
 +    );
 +    public static final MethodHandle c2me_natives_noise_interpolated_ptr = NativeLoader.linker.downcallHandle(
 +            FunctionDescriptor.of(
@@ -339,8 +339,8 @@ index 0000000000000000000000000000000000000000..015487ba22ac953e4612bef900d876e8
 +                    ValueLayout.JAVA_DOUBLE,
 +                    ValueLayout.JAVA_DOUBLE,
 +                    ValueLayout.JAVA_DOUBLE
-+            ),
-+            Linker.Option.critical(true)
++            )//,
++            //Linker.Option.critical(true)
 +    );
 +
 +    // typedef const struct interpolated_noise_sub_sampler {
@@ -526,8 +526,8 @@ index 0000000000000000000000000000000000000000..015487ba22ac953e4612bef900d876e8
 +                    ValueLayout.ADDRESS,
 +                    ValueLayout.JAVA_INT,
 +                    ValueLayout.JAVA_INT
-+            ),
-+            Linker.Option.critical(true)
++            )//,
++            //Linker.Option.critical(true)
 +    );
 +    public static final MethodHandle c2me_natives_end_islands_sample_ptr = NativeLoader.linker.downcallHandle(
 +            FunctionDescriptor.of(
@@ -535,8 +535,8 @@ index 0000000000000000000000000000000000000000..015487ba22ac953e4612bef900d876e8
 +                    ValueLayout.JAVA_LONG,
 +                    ValueLayout.JAVA_INT,
 +                    ValueLayout.JAVA_INT
-+            ),
-+            Linker.Option.critical(true)
++            )//,
++            //Linker.Option.critical(true)
 +    );
 +
 +    // c2me_natives_biome_access_sample, uint32_t, (const int64_t theSeed, const int32_t x, const int32_t y, const int32_t z)
@@ -547,8 +547,8 @@ index 0000000000000000000000000000000000000000..015487ba22ac953e4612bef900d876e8
 +                    ValueLayout.JAVA_INT,
 +                    ValueLayout.JAVA_INT,
 +                    ValueLayout.JAVA_INT
-+            ),
-+            Linker.Option.critical(true)
++            )//,
++            //Linker.Option.critical(true)
 +    );
 +
 +}
