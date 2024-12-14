@@ -115,15 +115,14 @@ index 0000000000000000000000000000000000000000..b632c4a636974535bf001f010de1dcb6
 +}
 diff --git a/src/main/java/me/earthme/luminol/functions/GlobalServerMemoryBar.java b/src/main/java/me/earthme/luminol/functions/GlobalServerMemoryBar.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..47809d78392fe0cb30ad68ca1c331784f1843269
+index 0000000000000000000000000000000000000000..4827562a5b4deca0153995b8e1680d820123a712
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/functions/GlobalServerMemoryBar.java
-@@ -0,0 +1,186 @@
+@@ -0,0 +1,171 @@
 +package me.earthme.luminol.functions;
 +
++import com.google.common.collect.Maps;
 +import com.mojang.logging.LogUtils;
-+import io.papermc.paper.threadedregions.ThreadedRegionizer;
-+import io.papermc.paper.threadedregions.TickRegions;
 +import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 +import me.earthme.luminol.config.modules.misc.MembarConfig;
 +import me.earthme.luminol.utils.NullPlugin;
@@ -131,8 +130,6 @@ index 0000000000000000000000000000000000000000..47809d78392fe0cb30ad68ca1c331784
 +import net.kyori.adventure.text.Component;
 +import net.kyori.adventure.text.minimessage.MiniMessage;
 +import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-+import net.minecraft.server.level.ServerLevel;
-+import net.minecraft.server.level.ServerPlayer;
 +import org.bukkit.Bukkit;
 +import org.bukkit.craftbukkit.entity.CraftPlayer;
 +import org.bukkit.entity.Player;
@@ -145,46 +142,36 @@ index 0000000000000000000000000000000000000000..47809d78392fe0cb30ad68ca1c331784
 +
 +public class GlobalServerMemoryBar {
 +    protected static final NullPlugin NULL_PLUGIN = new NullPlugin();
-+    protected static final Map<UUID, BossBar> uuid2Bossbars = new HashMap<>();
-+    protected static volatile ScheduledTask membarTask = null;
++    protected static final Map<UUID, BossBar> uuid2Bossbars = Maps.newConcurrentMap();
++    protected static final Map<UUID, ScheduledTask> scheduledTasks = new HashMap<>();
++    protected static volatile ScheduledTask scannerTask = null;
 +    private static final Logger logger = LogUtils.getLogger();
 +
 +    public static void init(){
 +        cancelBarUpdateTask();
 +
-+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(NULL_PLUGIN, c -> {
-+            membarTask = c;
++        scannerTask = Bukkit.getGlobalRegionScheduler().runAtFixedRate(NULL_PLUGIN, unused -> {
 +            try {
 +                update();
 +            }catch (Exception e){
 +                logger.error(e.getLocalizedMessage());
 +            }
-+        },1, MembarConfig.updateInterval);
++        }, 1, MembarConfig.updateInterval);
 +    }
 +
-+    public static void removeAllBars(){
-+        for (Map.Entry<UUID,BossBar> barEntry : uuid2Bossbars.entrySet()){
-+            final UUID playerUUID = barEntry.getKey();
-+            final BossBar memBar = barEntry.getValue();
-+
-+            final Player targetPlayer = Bukkit.getPlayer(playerUUID);{
-+                if (targetPlayer != null){
-+                    targetPlayer.hideBossBar(memBar);
-+                }
-+            }
-+        }
-+
-+        uuid2Bossbars.clear();
-+    }
 +
 +    public static void cancelBarUpdateTask(){
-+        removeAllBars();
-+
-+        if (membarTask == null || membarTask.isCancelled()){
++        if (scannerTask == null || scannerTask.isCancelled()){
 +            return;
 +        }
 +
-+        membarTask.cancel();
++        scannerTask.cancel();
++
++        for (ScheduledTask task : scheduledTasks.values()) {
++            if (!task.isCancelled()) {
++                task.cancel();
++            }
++        }
 +    }
 +
 +    public static boolean isPlayerVisible(Player player){
@@ -196,66 +183,64 @@ index 0000000000000000000000000000000000000000..47809d78392fe0cb30ad68ca1c331784
 +    }
 +
 +    private static void update(){
-+        updateBarValues();
-+        cleanUpPlayers();
++        doUpdate();
++        cleanUp();
 +    }
 +
-+    private static void cleanUpPlayers(){
-+        final List<UUID> toRemove = new ArrayList<>();
++    private static void cleanUp(){
++        final List<UUID> toCleanUp = new ArrayList<>();
 +
-+        for (Map.Entry<UUID,BossBar> bossBarEntry : uuid2Bossbars.entrySet()){
-+            final UUID uuid = bossBarEntry.getKey();
-+            boolean shouldRemove = true;
-+
-+            final Player target = Bukkit.getPlayer(uuid);
-+            if (target != null){
-+                shouldRemove = !isPlayerVisible(target);
-+            }
-+
-+            if (shouldRemove){
-+                toRemove.add(uuid);
++        for (Map.Entry<UUID, ScheduledTask> toCheck : scheduledTasks.entrySet()) {
++            if (toCheck.getValue().isCancelled()) {
++                toCleanUp.add(toCheck.getKey());
 +            }
 +        }
 +
-+        for (UUID uuid : toRemove){
-+            final BossBar removed =  uuid2Bossbars.remove(uuid);
-+            if (removed != null){
-+                final Player targetPlayer = Bukkit.getPlayer(uuid);
-+                if (targetPlayer != null){
-+                    targetPlayer.hideBossBar(removed);
++        for (UUID uuid : toCleanUp) {
++            scheduledTasks.remove(uuid);
++        }
++    }
++
++    private static void doUpdate(){
++        for (Player player : Bukkit.getOnlinePlayers()) {
++            scheduledTasks.computeIfAbsent(player.getUniqueId(), unused -> createBossBarForPlayer(player));
++        }
++    }
++
++    private static ScheduledTask createBossBarForPlayer(Player apiPlayer) {
++        return apiPlayer.getScheduler().runAtFixedRate(NULL_PLUGIN, (unused) -> {
++            final UUID playerUUID = apiPlayer.getUniqueId();
++
++            if (!isPlayerVisible(apiPlayer)) {
++                final BossBar removed = uuid2Bossbars.remove(playerUUID);
++
++                if (removed != null) {
++                    apiPlayer.hideBossBar(removed);
 +                }
-+            }
-+        }
-+    }
 +
-+    private static void updateBarValues(){
-+        MemoryUsage heap = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-+
-+        long used = heap.getUsed();
-+        long xmx = heap.getMax();
-+
-+
-+
-+        for (Player apiPlayer : Bukkit.getOnlinePlayers()){
-+            final ServerPlayer nmsPlayer = ((CraftPlayer) apiPlayer).getHandle();
-+            final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region = ((ServerLevel) nmsPlayer.level()).regioniser.getRegionAtUnsynchronised(nmsPlayer.moonrise$getSectionX(),nmsPlayer.moonrise$getSectionZ());
-+
-+            if (region == null){
-+                continue;
++                return;
 +            }
 +
-+            BossBar targetBossbar = uuid2Bossbars.get(nmsPlayer.getUUID());
++            MemoryUsage heap = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
 +
-+            if (targetBossbar == null && isPlayerVisible(apiPlayer)){
-+                targetBossbar = BossBar.bossBar(Component.text(""),0.0F, BossBar.Color.valueOf(MembarConfig.memColors.get(3)), BossBar.Overlay.NOTCHED_20);
-+                uuid2Bossbars.put(nmsPlayer.getUUID(),targetBossbar);
-+                apiPlayer.showBossBar(targetBossbar);
-+            }
++            long used = heap.getUsed();
++            long xmx = heap.getMax();
 +
-+            if (targetBossbar != null){
-+                updateMembar(targetBossbar,used,xmx);
++            BossBar targetBossbar = uuid2Bossbars.computeIfAbsent(
++                    playerUUID,
++                    (unused1) -> BossBar.bossBar(Component.text(""),0.0F, BossBar.Color.valueOf(MembarConfig.memColors.get(3)), BossBar.Overlay.NOTCHED_20)
++            );
++
++            apiPlayer.showBossBar(targetBossbar);
++
++            updateMembar(targetBossbar, used, xmx);
++        }, () -> {
++            final BossBar removed = uuid2Bossbars.remove(apiPlayer.getUniqueId());
++
++            if (removed != null) {
++                apiPlayer.hideBossBar(removed);
 +            }
-+        }
++        }, 0, MembarConfig.updateInterval);
 +    }
 +
 +    private static void updateMembar(@NotNull BossBar bar, long used, long xmx){
@@ -276,7 +261,7 @@ index 0000000000000000000000000000000000000000..47809d78392fe0cb30ad68ca1c331784
 +        final String content = "<%s><text></%s>";
 +        final String replaced = String.format(content,colorString,colorString);
 +
-+        return MiniMessage.miniMessage().deserialize(replaced,Placeholder.parsed("text", String.format("%.2f", (double)max / (1024 * 1024))));
++        return MiniMessage.miniMessage().deserialize(replaced,Placeholder.parsed("text", String.format("%.2f", max / (1024 * 1024))));
 +    }
 +
 +    private static @NotNull Component getMemoryComponent(long used,long max){

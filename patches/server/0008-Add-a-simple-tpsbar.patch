@@ -117,15 +117,17 @@ index 0000000000000000000000000000000000000000..aafb2f5052c7c8e5971a47308253badb
 +}
 diff --git a/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java b/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..026807e0851d67c6d57e81f573ac1bf8fedc6109
+index 0000000000000000000000000000000000000000..ff503ab69dce8f034500e64ce31556d721395732
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java
-@@ -0,0 +1,224 @@
+@@ -0,0 +1,214 @@
 +package me.earthme.luminol.functions;
 +
++import com.google.common.collect.Maps;
 +import com.mojang.logging.LogUtils;
 +import io.papermc.paper.threadedregions.ThreadedRegionizer;
 +import io.papermc.paper.threadedregions.TickData;
++import io.papermc.paper.threadedregions.TickRegionScheduler;
 +import io.papermc.paper.threadedregions.TickRegions;
 +import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 +import me.earthme.luminol.config.modules.misc.TpsBarConfig;
@@ -134,8 +136,6 @@ index 0000000000000000000000000000000000000000..026807e0851d67c6d57e81f573ac1bf8
 +import net.kyori.adventure.text.Component;
 +import net.kyori.adventure.text.minimessage.MiniMessage;
 +import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-+import net.minecraft.server.level.ServerLevel;
-+import net.minecraft.server.level.ServerPlayer;
 +import org.bukkit.Bukkit;
 +import org.bukkit.craftbukkit.entity.CraftPlayer;
 +import org.bukkit.entity.Player;
@@ -146,46 +146,37 @@ index 0000000000000000000000000000000000000000..026807e0851d67c6d57e81f573ac1bf8
 +
 +public class GlobalServerTpsBar {
 +    protected static final NullPlugin NULL_PLUGIN = new NullPlugin();
-+    protected static final Map<UUID,BossBar> uuid2Bossbars = new HashMap<>();
-+    protected static volatile ScheduledTask tpsbarTask = null;
++    protected static final Map<UUID, BossBar> uuid2Bossbars = Maps.newConcurrentMap();
++    protected static final Map<UUID, ScheduledTask> scheduledTasks = new HashMap<>();
++
++    protected static volatile ScheduledTask scannerTask = null;
 +    private static final Logger logger = LogUtils.getLogger();
 +
 +    public static void init(){
 +        cancelBarUpdateTask();
 +
-+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(NULL_PLUGIN,c -> {
-+            tpsbarTask = c;
++        scannerTask = Bukkit.getGlobalRegionScheduler().runAtFixedRate(NULL_PLUGIN, unused -> {
 +            try {
 +                update();
++                cleanUp();
 +            }catch (Exception e){
 +                logger.error(e.getLocalizedMessage());
 +            }
-+        },1,TpsBarConfig.updateInterval);
-+    }
-+
-+    public static void removeAllBars(){
-+        for (Map.Entry<UUID,BossBar> barEntry : uuid2Bossbars.entrySet()){
-+            final UUID playerUUID = barEntry.getKey();
-+            final BossBar tpsBar = barEntry.getValue();
-+
-+            final Player targetPlayer = Bukkit.getPlayer(playerUUID);{
-+                if (targetPlayer != null){
-+                    targetPlayer.hideBossBar(tpsBar);
-+                }
-+            }
-+        }
-+
-+        uuid2Bossbars.clear();
++        }, 1, TpsBarConfig.updateInterval);
 +    }
 +
 +    public static void cancelBarUpdateTask(){
-+        removeAllBars();
-+
-+        if (tpsbarTask == null || tpsbarTask.isCancelled()){
++        if (scannerTask == null || scannerTask.isCancelled()){
 +            return;
 +        }
 +
-+        tpsbarTask.cancel();
++        scannerTask.cancel();
++
++        for (ScheduledTask task : scheduledTasks.values()) {
++            if (!task.isCancelled()) {
++                task.cancel();
++            }
++        }
 +    }
 +
 +    public static boolean isPlayerVisible(Player player){
@@ -197,63 +188,62 @@ index 0000000000000000000000000000000000000000..026807e0851d67c6d57e81f573ac1bf8
 +    }
 +
 +    private static void update(){
-+        updateBarValues();
-+        cleanUpPlayers();
-+    }
-+
-+    private static void cleanUpPlayers(){
-+        final List<UUID> toRemove = new ArrayList<>();
-+
-+        for (Map.Entry<UUID,BossBar> bossBarEntry : uuid2Bossbars.entrySet()){
-+            final UUID uuid = bossBarEntry.getKey();
-+            boolean shouldRemove = true;
-+
-+            final Player target = Bukkit.getPlayer(uuid);
-+            if (target != null){
-+                shouldRemove = !isPlayerVisible(target);
-+            }
-+
-+            if (shouldRemove){
-+                toRemove.add(uuid);
-+            }
-+        }
-+
-+        for (UUID uuid : toRemove){
-+           final BossBar removed =  uuid2Bossbars.remove(uuid);
-+           if (removed != null){
-+               final Player targetPlayer = Bukkit.getPlayer(uuid);
-+               if (targetPlayer != null){
-+                   targetPlayer.hideBossBar(removed);
-+               }
-+           }
++        for (Player player : Bukkit.getOnlinePlayers()) {
++            scheduledTasks.computeIfAbsent(player.getUniqueId(), unused -> createBossBarForPlayer(player));
 +        }
 +    }
 +
-+    private static void updateBarValues(){
-+        for (Player apiPlayer : Bukkit.getOnlinePlayers()){
-+            final ServerPlayer nmsPlayer = ((CraftPlayer) apiPlayer).getHandle();
-+            final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region = ((ServerLevel) nmsPlayer.level()).regioniser.getRegionAtUnsynchronised(nmsPlayer.moonrise$getSectionX(),nmsPlayer.moonrise$getSectionZ());
++    private static void cleanUp() {
++        final List<UUID> toCleanUp = new ArrayList<>();
 +
-+            if (region == null){
-+                continue;
++        for (Map.Entry<UUID, ScheduledTask> toCheck : scheduledTasks.entrySet()) {
++            if (toCheck.getValue().isCancelled()) {
++                toCleanUp.add(toCheck.getKey());
++            }
++        }
++
++        for (UUID uuid : toCleanUp) {
++            scheduledTasks.remove(uuid);
++        }
++    }
++
++    public static ScheduledTask createBossBarForPlayer(@NotNull Player apiPlayer) {
++        final UUID playerUUID = apiPlayer.getUniqueId();
++
++        return apiPlayer.getScheduler().runAtFixedRate(NULL_PLUGIN, (n) -> {
++            if (!isPlayerVisible(apiPlayer)) {
++                final BossBar removed = uuid2Bossbars.remove(playerUUID);
++
++                if (removed != null) {
++                    apiPlayer.hideBossBar(removed);
++                }
++                return;
 +            }
 +
++            final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region = TickRegionScheduler.getCurrentRegion();
 +            final TickData.TickReportData reportData = region.getData().getRegionSchedulingHandle().getTickReport5s(System.nanoTime());
 +
-+            BossBar targetBossbar = uuid2Bossbars.get(nmsPlayer.getUUID());
 +
-+            if (targetBossbar == null && isPlayerVisible(apiPlayer)){
-+                targetBossbar = BossBar.bossBar(Component.text(""),0.0F, BossBar.Color.valueOf(TpsBarConfig.tpsColors.get(3)), BossBar.Overlay.NOTCHED_20);
-+                uuid2Bossbars.put(nmsPlayer.getUUID(),targetBossbar);
-+                apiPlayer.showBossBar(targetBossbar);
-+            }
++            BossBar targetBossbar = uuid2Bossbars.computeIfAbsent(
++                    playerUUID,
++                    unused -> BossBar.bossBar(Component.text(""),0.0F, BossBar.Color.valueOf(TpsBarConfig.tpsColors.get(3)), BossBar.Overlay.NOTCHED_20)
++            );
 +
-+            if (reportData != null && targetBossbar != null){
++            apiPlayer.showBossBar(targetBossbar);
++
++            if (reportData != null){
 +                final TickData.SegmentData tpsData = reportData.tpsData().segmentAll();
 +                final double mspt = reportData.timePerTickData().segmentAll().average() / 1.0E6;
-+                updateTpsBar(tpsData.average(),mspt,targetBossbar,apiPlayer);
++
++                updateTpsBar(tpsData.average(), mspt, targetBossbar, apiPlayer);
 +            }
-+        }
++        }, () -> {
++            final BossBar removed = uuid2Bossbars.remove(playerUUID); // Auto clean up it
++
++            if (removed != null) {
++                apiPlayer.hideBossBar(removed);
++            }
++        }, 0, TpsBarConfig.updateInterval);
 +    }
 +
 +    private static void updateTpsBar(double tps, double mspt, @NotNull BossBar bar, @NotNull Player player){
