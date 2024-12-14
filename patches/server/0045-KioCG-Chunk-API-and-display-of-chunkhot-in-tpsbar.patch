@@ -132,10 +132,10 @@ index aafb2f5052c7c8e5971a47308253badb3027093c..9fe7ac7ba83bbcc9a2a851a5cace4764
      public static int updateInterval = 15;
  
 diff --git a/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java b/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java
-index 026807e0851d67c6d57e81f573ac1bf8fedc6109..c45f6bd60d1cf7a915aa6ceea07c0929507b86e2 100644
+index ff503ab69dce8f034500e64ce31556d721395732..fab8c7f1f527e8a9986cdbeab473a4c389a87587 100644
 --- a/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java
 +++ b/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java
-@@ -138,7 +138,8 @@ public class GlobalServerTpsBar {
+@@ -128,7 +128,8 @@ public class GlobalServerTpsBar {
                  TpsBarConfig.tpsBarFormat,
                  Placeholder.component("tps",getTpsComponent(tps)),
                  Placeholder.component("mspt",getMsptComponent(mspt)),
@@ -145,7 +145,7 @@ index 026807e0851d67c6d57e81f573ac1bf8fedc6109..c45f6bd60d1cf7a915aa6ceea07c0929
          ));
          bar.color(barColorFromTps(tps));
          bar.progress((float) Math.min((float)1,Math.max(mspt / 50,0)));
-@@ -180,6 +181,32 @@ public class GlobalServerTpsBar {
+@@ -170,6 +171,32 @@ public class GlobalServerTpsBar {
          return MiniMessage.miniMessage().deserialize(replaced,Placeholder.parsed("text", String.format("%.2f", mspt)));
      }
  
