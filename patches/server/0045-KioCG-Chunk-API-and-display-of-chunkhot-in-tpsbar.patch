@@ -359,10 +359,10 @@ index 12127b14babf646711d3a118416453c4f1ac1460..5929cd58066b1a8f305b411af8ac4abc
 +    // KioCG end
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
-index d3de8e387b75368e13d03ccace09624b5e32b484..bed2781dfe66fc6dd801a602db65b18691e21932 100644
+index 5280e0bd88b39a2f1ca62b03ed2c54a89df4f212..b6b5837df2bcd229425e27b513a47922748c01ff 100644
 --- a/src/main/java/net/minecraft/world/entity/Mob.java
 +++ b/src/main/java/net/minecraft/world/entity/Mob.java
-@@ -1856,4 +1856,11 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+@@ -1855,4 +1855,11 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
      public float[] getArmorDropChances() {
          return this.armorDropChances;
      }

@@ -5,7 +5,7 @@ Subject: [PATCH] Gale Optimize sun burn tick
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 4e1ffa09617ec1cec7117264d7d665e17eead4b8..8a6b3488360f8e64697a7bb80bb7284119658cce 100644
+index 821fcf2bd1dacda191d7c8c17199069ebb9e73d3..9c29f99c9426db12231d7423ca24ca6fecf9c868 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -274,7 +274,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -39,16 +39,16 @@ index 4e1ffa09617ec1cec7117264d7d665e17eead4b8..8a6b3488360f8e64697a7bb80bb72841
          this.absMoveTo(x, y, z);
          this.absRotateTo(yaw, pitch);
 diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
-index 4e587a5c59eb271ed31c5584bd665953ae82aa8a..d3de8e387b75368e13d03ccace09624b5e32b484 100644
+index 4e587a5c59eb271ed31c5584bd665953ae82aa8a..5280e0bd88b39a2f1ca62b03ed2c54a89df4f212 100644
 --- a/src/main/java/net/minecraft/world/entity/Mob.java
 +++ b/src/main/java/net/minecraft/world/entity/Mob.java
-@@ -1761,13 +1761,29 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+@@ -1761,13 +1761,28 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
  
      protected void playAttackSound() {}
  
 +    // Gale start - JettPack - optimize sun burn tick - cache eye blockpos
 +    private BlockPos cached_eye_blockpos;
-+    private int cached_position_hashcode;
++    private net.minecraft.world.phys.Vec3 cached_position;
 +    // Gale end - JettPack - optimize sun burn tick - cache eye blockpos
 +
      public boolean isSunBurnTick() {
@@ -56,10 +56,9 @@ index 4e587a5c59eb271ed31c5584bd665953ae82aa8a..d3de8e387b75368e13d03ccace09624b
 -            float f = this.getLightLevelDependentMagicValue();
 -            BlockPos blockposition = BlockPos.containing(this.getX(), this.getEyeY(), this.getZ());
 +            // Gale start - JettPack - optimize sun burn tick - optimizations and cache eye blockpos
-+            int positionHashCode = this.position.hashCode();
-+            if (this.cached_position_hashcode != positionHashCode) {
++            if (this.cached_position != this.position) {
 +                this.cached_eye_blockpos = BlockPos.containing(this.getX(), this.getEyeY(), this.getZ());
-+                this.cached_position_hashcode = positionHashCode;
++                this.cached_position = this.position;
 +            }
 +
 +            float f = this.getLightLevelDependentMagicValue(cached_eye_blockpos); // Pass BlockPos to getBrightness
