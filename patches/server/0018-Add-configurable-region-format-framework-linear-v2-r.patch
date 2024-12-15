@@ -68,7 +68,7 @@ index 0000000000000000000000000000000000000000..d92f1d549c7e01daa6b5bba7d405e462
 +}
 diff --git a/src/main/java/abomination/LinearRegionFile.java b/src/main/java/abomination/LinearRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..192572f2672b9afb8c593dbf96ba95225bf985dc
+index 0000000000000000000000000000000000000000..4a8a71686dddfc6b0c27882d1f73b92c96f6173e
 --- /dev/null
 +++ b/src/main/java/abomination/LinearRegionFile.java
 @@ -0,0 +1,666 @@
@@ -108,7 +108,7 @@ index 0000000000000000000000000000000000000000..192572f2672b9afb8c593dbf96ba9522
 +
 +// LinearRegionFile_implementation_version_0_5byXymb
 +// Just gonna use this string to inform other forks about updates ;-)
-+public class LinearRegionFile extends Thread implements IRegionFile{
++public class LinearRegionFile implements IRegionFile{
 +    private static final long SUPERBLOCK = 0xc3ff13183cca9d9aL;
 +    private static final byte VERSION = 3;
 +    private static final int HEADER_SIZE = 27;
@@ -919,7 +919,7 @@ index 8cc0c01a19fc71753d7c3ed4fa7e9992aaf93b5a..88be8a6232bc3311cc0bdb7c697f7a78
          this.stopPart2();
      }
 diff --git a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-index 622d0cbe023774d92d212f242b60b96317720835..b34b2519a2abccd1d60edb7a89cb080541df18d0 100644
+index 622d0cbe023774d92d212f242b60b96317720835..9b4b01a741e8779f4ea06b0fd801ce243e179910 100644
 --- a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 +++ b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 @@ -75,7 +75,7 @@ public class WorldUpgrader implements AutoCloseable {
@@ -940,6 +940,33 @@ index 622d0cbe023774d92d212f242b60b96317720835..b34b2519a2abccd1d60edb7a89cb0805
              });
  
              if (afile == null) {
+@@ -419,7 +419,7 @@ public class WorldUpgrader implements AutoCloseable {
+                         List<ChunkPos> list1 = Lists.newArrayList();
+ 
+                         try {
+-                            RegionFile regionfile = new RegionFile(key, file.toPath(), regionDirectory, true);
++                            abomination.IRegionFile regionfile = net.minecraft.world.level.chunk.storage.RegionFileStorage.createNew(key, file.toPath(), regionDirectory, true);
+ 
+                             try {
+                                 for (int i1 = 0; i1 < 32; ++i1) {
+@@ -482,7 +482,7 @@ public class WorldUpgrader implements AutoCloseable {
+ 
+         protected abstract boolean tryProcessOnePosition(T storage, ChunkPos chunkPos, ResourceKey<Level> worldKey);
+ 
+-        private void onFileFinished(RegionFile regionFile) {
++        private void onFileFinished(abomination.IRegionFile regionFile) {
+             if (WorldUpgrader.this.recreateRegionFiles) {
+                 if (this.previousWriteFuture != null) {
+                     this.previousWriteFuture.join();
+@@ -507,7 +507,7 @@ public class WorldUpgrader implements AutoCloseable {
+         }
+     }
+ 
+-    static record FileToUpgrade(RegionFile file, List<ChunkPos> chunksToUpgrade) {
++    static record FileToUpgrade(abomination.IRegionFile file, List<ChunkPos> chunksToUpgrade) {
+ 
+     }
+ 
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFile.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFile.java
 index 16f07007a0f73ec0c6f421c9b082518e87e8cc7b..fc69834e18e0860750d878e1361722fc38b513f8 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFile.java
@@ -1003,7 +1030,7 @@ index 16f07007a0f73ec0c6f421c9b082518e87e8cc7b..fc69834e18e0860750d878e1361722fc
          }
          // Paper end - rewrite chunk system
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index e40665cead218502b44dd49051a53326ed94f061..aa6603b11b5ee42f118e202141772c9fcf450d0c 100644
+index e40665cead218502b44dd49051a53326ed94f061..d16d0c0ec4cd32688b436bc73d152fe28b6027c2 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -23,7 +23,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
@@ -1023,7 +1050,7 @@ index e40665cead218502b44dd49051a53326ed94f061..aa6603b11b5ee42f118e202141772c9f
 +        return "r." + (chunkX >> REGION_SHIFT) + "." + (chunkZ >> REGION_SHIFT) + getExtensionName(); // Luminol - Configurable region file format
      }
 +    // Luminol start - Configurable region file format
-+    protected abomination.IRegionFile createNew(RegionStorageInfo info, Path filePath, Path folder, boolean sync) throws IOException{
++    public static abomination.IRegionFile createNew(RegionStorageInfo info, Path filePath, Path folder, boolean sync) throws IOException{
 +        final me.earthme.luminol.utils.EnumRegionFormat regionFormat = me.earthme.luminol.config.modules.misc.RegionFormatConfig.regionFormat;
 +        final String fullFileName = filePath.getFileName().toString();
 +        final String argument;
@@ -1138,6 +1165,15 @@ index e40665cead218502b44dd49051a53326ed94f061..aa6603b11b5ee42f118e202141772c9f
              if (ret != null) {
                  return ret;
              }
+@@ -278,7 +303,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+ 
+             FileUtil.createDirectoriesSafe(this.folder);
+ 
+-            ret = new RegionFile(this.info, regionPath, this.folder, this.sync);
++            ret = this.createNew(this.info, regionPath, this.folder, this.sync);
+ 
+             this.regionCache.putAndMoveToFirst(key, ret);
+ 
 @@ -292,7 +317,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
          org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO PAPER - You may ask for help on Discord, but do not file an issue. These error messages can not be removed.");
      }
