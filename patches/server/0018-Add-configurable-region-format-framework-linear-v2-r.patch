@@ -834,7 +834,7 @@ index 0000000000000000000000000000000000000000..60546260cd1d535cc596485de2ced48b
 +}
 diff --git a/src/main/java/me/earthme/luminol/utils/EnumRegionFormat.java b/src/main/java/me/earthme/luminol/utils/EnumRegionFormat.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f8e9ebd95312e94a07dc18c3435471810f0b5b2a
+index 0000000000000000000000000000000000000000..73b4f9b5f608322839cf1e37fbf1d3a147247c60
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/utils/EnumRegionFormat.java
 @@ -0,0 +1,40 @@
@@ -846,8 +846,8 @@ index 0000000000000000000000000000000000000000..f8e9ebd95312e94a07dc18c343547181
 +import org.jetbrains.annotations.Nullable;
 +
 +public enum EnumRegionFormat {
-+    MCA("mca", ".mca" , (info) -> new RegionFile(info.info(), info.filePath(), info.folder(), info.sync())),
-+    LINEAR_V2("linear_v2", ".linear" ,(info) -> new LinearRegionFile(info.info(), info.filePath(), info.folder(), info.sync(), RegionFormatConfig.linearCompressionLevel));
++    MCA("mca", "mca" , (info) -> new RegionFile(info.info(), info.filePath(), info.folder(), info.sync())),
++    LINEAR_V2("linear_v2", "linear" ,(info) -> new LinearRegionFile(info.info(), info.filePath(), info.folder(), info.sync(), RegionFormatConfig.linearCompressionLevel));
 +
 +    private final String name;
 +    private final String argument;
