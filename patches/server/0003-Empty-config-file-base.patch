@@ -192,10 +192,10 @@ index 0000000000000000000000000000000000000000..9f6896711907ac30fe0c00130207b970
 +}
 diff --git a/src/main/java/me/earthme/luminol/config/LuminolConfig.java b/src/main/java/me/earthme/luminol/config/LuminolConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..976cc572861174787b37992388a03ab01f8703a4
+index 0000000000000000000000000000000000000000..fcacd381e4a5875ed0c542a9e6c1804fae823435
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/config/LuminolConfig.java
-@@ -0,0 +1,220 @@
+@@ -0,0 +1,221 @@
 +package me.earthme.luminol.config;
 +
 +import com.electronwill.nightconfig.core.file.CommentedFileConfig;
@@ -275,6 +275,7 @@ index 0000000000000000000000000000000000000000..976cc572861174787b37992388a03ab0
 +            loadAllModules();
 +        }catch (Exception e){
 +            logger.error("Failed to load config modules!",e);
++            throw new RuntimeException(e);
 +        }
 +
 +        configFileInstance.save();

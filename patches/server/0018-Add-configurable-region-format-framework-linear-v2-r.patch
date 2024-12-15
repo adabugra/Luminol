@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
-Date: Sun, 15 Dec 2024 12:11:39 +0800
+Date: Sun, 15 Dec 2024 12:53:33 +0800
 Subject: [PATCH] Add configurable region format framework & linear v2 region 
  format support
 
@@ -778,18 +778,6 @@ index 51c126735ace8fdde89ad97b5cab62f244212db0..c7d4d944eb198ac53a3eeae717a25c7d
 -    public void moonrise$write(final RegionFile regionFile) throws IOException;
 +    public void moonrise$write(final abomination.IRegionFile regionFile) throws IOException; // Luminol - Configurable region file format
  }
-diff --git a/src/main/java/me/earthme/luminol/config/LuminolConfig.java b/src/main/java/me/earthme/luminol/config/LuminolConfig.java
-index 976cc572861174787b37992388a03ab01f8703a4..fcacd381e4a5875ed0c542a9e6c1804fae823435 100644
---- a/src/main/java/me/earthme/luminol/config/LuminolConfig.java
-+++ b/src/main/java/me/earthme/luminol/config/LuminolConfig.java
-@@ -77,6 +77,7 @@ public class LuminolConfig {
-             loadAllModules();
-         }catch (Exception e){
-             logger.error("Failed to load config modules!",e);
-+            throw new RuntimeException(e);
-         }
- 
-         configFileInstance.save();
 diff --git a/src/main/java/me/earthme/luminol/config/modules/misc/RegionFormatConfig.java b/src/main/java/me/earthme/luminol/config/modules/misc/RegionFormatConfig.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..60546260cd1d535cc596485de2ced48b7e045b3a
