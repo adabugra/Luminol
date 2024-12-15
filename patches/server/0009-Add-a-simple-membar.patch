@@ -115,7 +115,7 @@ index 0000000000000000000000000000000000000000..b632c4a636974535bf001f010de1dcb6
 +}
 diff --git a/src/main/java/me/earthme/luminol/functions/GlobalServerMemoryBar.java b/src/main/java/me/earthme/luminol/functions/GlobalServerMemoryBar.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4827562a5b4deca0153995b8e1680d820123a712
+index 0000000000000000000000000000000000000000..3535cf03e7855b4d8b312ccf3a7b0564ea753019
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/functions/GlobalServerMemoryBar.java
 @@ -0,0 +1,171 @@
@@ -240,7 +240,7 @@ index 0000000000000000000000000000000000000000..4827562a5b4deca0153995b8e1680d82
 +            if (removed != null) {
 +                apiPlayer.hideBossBar(removed);
 +            }
-+        }, 0, MembarConfig.updateInterval);
++        }, 1, MembarConfig.updateInterval);
 +    }
 +
 +    private static void updateMembar(@NotNull BossBar bar, long used, long xmx){

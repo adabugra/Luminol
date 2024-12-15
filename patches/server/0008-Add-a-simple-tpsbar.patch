@@ -117,7 +117,7 @@ index 0000000000000000000000000000000000000000..aafb2f5052c7c8e5971a47308253badb
 +}
 diff --git a/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java b/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ff503ab69dce8f034500e64ce31556d721395732
+index 0000000000000000000000000000000000000000..de2f03d6e771c09e8da2da454b7ec4a16c0a17ab
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java
 @@ -0,0 +1,214 @@
@@ -243,7 +243,7 @@ index 0000000000000000000000000000000000000000..ff503ab69dce8f034500e64ce31556d7
 +            if (removed != null) {
 +                apiPlayer.hideBossBar(removed);
 +            }
-+        }, 0, TpsBarConfig.updateInterval);
++        }, 1, TpsBarConfig.updateInterval);
 +    }
 +
 +    private static void updateTpsBar(double tps, double mspt, @NotNull BossBar bar, @NotNull Player player){
