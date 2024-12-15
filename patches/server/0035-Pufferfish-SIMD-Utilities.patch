@@ -5,10 +5,10 @@ Subject: [PATCH] Pufferfish SIMD Utilities
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 021b59d19d1af866fbbe7d68c700365b098cabdf..97c1116fd2695cf4061f428910d4fcb4b605edcc 100644
+index 4b79f96103c98896332113ffe5f0e22cf08ffdd1..fbf51f738e98ac6e8358a7fa81b7fc545469a5a6 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -89,6 +89,14 @@ paperweight {
+@@ -94,6 +94,14 @@ paperweight {
      craftBukkitPackageVersion.set("v1_21_R3") // also needs to be updated in MappingEnvironment
  }
  

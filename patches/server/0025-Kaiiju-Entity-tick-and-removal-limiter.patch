@@ -5,7 +5,7 @@ Subject: [PATCH] Kaiiju Entity tick and removal limiter
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 017dc1ff0a7c6f7c50a57bf615fc31947ed49639..021b59d19d1af866fbbe7d68c700365b098cabdf 100644
+index 8f23bf19618382ccf5fd10a0b17b57cd445dea58..4b79f96103c98896332113ffe5f0e22cf08ffdd1 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -27,6 +27,7 @@ abstract class MockitoAgentProvider : CommandLineArgumentProvider {

@@ -83,7 +83,7 @@ index 5503d506c595296ecad09a3ce4497a365f216af5..98aef7a3cfc759e4415df3a56b5fe01e
                      if (!tickratemanager.isEntityFrozen(entity)) {
                          gameprofilerfiller.push("checkDespawn");
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 1651a6ba49d0683cd505251fdcdc5a2fd29725c3..4e1ffa09617ec1cec7117264d7d665e17eead4b8 100644
+index bd3f0c807c36ecfb8a89a0ca68ffa0c3640b7423..821fcf2bd1dacda191d7c8c17199069ebb9e73d3 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -390,6 +390,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess

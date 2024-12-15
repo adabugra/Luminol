@@ -132,7 +132,7 @@ index aafb2f5052c7c8e5971a47308253badb3027093c..9fe7ac7ba83bbcc9a2a851a5cace4764
      public static int updateInterval = 15;
  
 diff --git a/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java b/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java
-index ff503ab69dce8f034500e64ce31556d721395732..fab8c7f1f527e8a9986cdbeab473a4c389a87587 100644
+index de2f03d6e771c09e8da2da454b7ec4a16c0a17ab..0b7347e8fdf995900221ee4aa4e97a4d260c6f9f 100644
 --- a/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java
 +++ b/src/main/java/me/earthme/luminol/functions/GlobalServerTpsBar.java
 @@ -128,7 +128,8 @@ public class GlobalServerTpsBar {
@@ -179,10 +179,10 @@ index ff503ab69dce8f034500e64ce31556d721395732..fab8c7f1f527e8a9986cdbeab473a4c3
          if (mspt == -1){
              return BossBar.Color.valueOf(TpsBarConfig.tpsColors.get(3));
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 1c052f730d834187c6645dd9530c8a6e7879b3d3..af904418f6977c253ada47bc6a58bae054e38c2c 100644
+index c7390e0341cd19fa5e0b21882f27943174f718d0..19e1dfbcd69e3f960d148b014e9e9248072918a2 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1801,6 +1801,29 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1802,6 +1802,29 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              } finally { foliaProfiler.stopTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.ENTITY_SCHEDULER_TICK); } // Folia - profiler
          }
          // Folia end - region threading
@@ -212,7 +212,7 @@ index 1c052f730d834187c6645dd9530c8a6e7879b3d3..af904418f6977c253ada47bc6a58bae0
          if (region == null) this.tickRateManager.tick(); // Folia - region threading
          this.tickChildren(shouldKeepTicking, region); // Folia - region threading
          if (region == null && i - this.lastServerStatus >= MinecraftServer.STATUS_EXPIRE_TIME_NANOS) { // Folia - region threading
-@@ -1809,6 +1832,20 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1810,6 +1833,20 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
  
          // Folia - region threading
