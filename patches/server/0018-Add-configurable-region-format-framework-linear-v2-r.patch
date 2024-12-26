@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
 Date: Sun, 15 Dec 2024 12:53:33 +0800
-Subject: [PATCH] Add configurable region format framework & linear v2 region 
+Subject: [PATCH] Add configurable region format framework & linear v2 region
  format support
 
 
@@ -68,15 +68,12 @@ index 0000000000000000000000000000000000000000..d92f1d549c7e01daa6b5bba7d405e462
 +}
 diff --git a/src/main/java/abomination/LinearRegionFile.java b/src/main/java/abomination/LinearRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4a8a71686dddfc6b0c27882d1f73b92c96f6173e
+index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856d79a6a38
 --- /dev/null
 +++ b/src/main/java/abomination/LinearRegionFile.java
-@@ -0,0 +1,666 @@
+@@ -0,0 +1,608 @@
 +package abomination;
 +
-+import ca.spottedleaf.concurrentutil.executor.PrioritisedExecutor;
-+import ca.spottedleaf.concurrentutil.executor.thread.PrioritisedThreadPool;
-+import ca.spottedleaf.concurrentutil.util.Priority;
 +import ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO;
 +import com.github.luben.zstd.ZstdInputStream;
 +import com.github.luben.zstd.ZstdOutputStream;
@@ -85,7 +82,6 @@ index 0000000000000000000000000000000000000000..4a8a71686dddfc6b0c27882d1f73b92c
 +import net.jpountz.lz4.LZ4Compressor;
 +import net.jpountz.lz4.LZ4Factory;
 +import net.jpountz.lz4.LZ4FastDecompressor;
-+import net.minecraft.server.MinecraftServer;
 +import net.openhft.hashing.LongHashFunction;
 +import net.minecraft.nbt.CompoundTag;
 +import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
@@ -99,12 +95,9 @@ index 0000000000000000000000000000000000000000..4a8a71686dddfc6b0c27882d1f73b92c
 +import java.nio.file.Files;
 +import java.nio.file.Path;
 +import java.nio.file.StandardCopyOption;
-+import java.util.concurrent.CompletableFuture;
-+import java.util.concurrent.Executor;
-+import java.util.concurrent.TimeUnit;
++import java.util.concurrent.ScheduledFuture;
 +import java.util.concurrent.atomic.AtomicInteger;
 +import java.util.concurrent.locks.ReentrantLock;
-+import java.util.stream.IntStream;
 +
 +// LinearRegionFile_implementation_version_0_5byXymb
 +// Just gonna use this string to inform other forks about updates ;-)
@@ -136,7 +129,7 @@ index 0000000000000000000000000000000000000000..4a8a71686dddfc6b0c27882d1f73b92c
 +    private int bucketSize = 4;
 +
 +    private final AtomicInteger modifiedChunkCount = new AtomicInteger(0);
-+    private PrioritisedExecutor.PrioritisedTask ioTask = null;
++    private ScheduledFuture<?> ioTask = null;
 +
 +    public Path getRegionFile() {
 +        return this.regionFile;
@@ -354,27 +347,11 @@ index 0000000000000000000000000000000000000000..4a8a71686dddfc6b0c27882d1f73b92c
 +        }
 +    }
 +
-+    private static final AtomicInteger ioThreadId = new AtomicInteger();
-+    private static final PrioritisedThreadPool linearIOThreadPool = new PrioritisedThreadPool(thread -> {
-+        thread.setName("Linear RegionFile IO Thread- " + ioThreadId.getAndIncrement());
-+        thread.setContextClassLoader(MinecraftServer.class.getClassLoader());
-+    });
-+    public static final long WORKER_QUEUE_HOLD_TIME = (long)(20.0e6); // 20ms
-+    private static PrioritisedExecutor linearIOExecutor;
-+
 +    /*
 +    private static final int SAVE_THREAD_MAX_COUNT = 6;
 +    private static final Object saveLock = new Object();
 +    private static int activeSaveThreads = 0;
 +    */
-+
-+    public static void initIOExecutor() {
-+        linearIOExecutor = linearIOThreadPool.createExecutorGroup(1, 0).createExecutor(RegionFormatConfig.linearIoThreadCount, WORKER_QUEUE_HOLD_TIME, 0);
-+    }
-+
-+    public static void shutdownIOExecutor() {
-+        linearIOThreadPool.shutdown(true);
-+    }
 +
 +    /*public void run() {
 +        try {
@@ -560,51 +537,15 @@ index 0000000000000000000000000000000000000000..4a8a71686dddfc6b0c27882d1f73b92c
 +        markToSave();
 +        this.modifiedChunkCount.getAndIncrement();
 +
-+        if (ioTask == null) {
-+            this.scheduleSave();
-+        }else {
-+            if (this.ioTask.getPriority() == Priority.COMPLETING) {
-+                this.scheduleSave();
-+                return;
-+            }
-+
-+            this.ioTask.raisePriority(this.computeSavePriority());
-+        }
++        this.ioTask = RegionFormatConfig.linearFlusher.claimTask(this.ioTask, this);
 +    }
 +
-+    private Priority computeSavePriority() {
-+        final int currentModifiedChunkCount = this.modifiedChunkCount.get();
-+
-+        final int[] ordinals = new int[]{2, 3, 4, 5, 6};
-+        final int[] thresholds = new int[]{20, 40, 60, 80, 100};
-+        final int coverPercent = (currentModifiedChunkCount / 1024) * 100;
-+
-+        int actualOrdinal = 6;
-+        for (int i = 0; i < thresholds.length; i++) {
-+            if (coverPercent >= thresholds[i]) {
-+                actualOrdinal = ordinals[i];
-+            }
-+        }
-+
-+        return Priority.values()[actualOrdinal];
++    public synchronized boolean isClosed() {
++        return this.close;
 +    }
 +
-+    private void scheduleSave() {
-+        final PrioritisedExecutor.PrioritisedTask created = linearIOExecutor.createTask(() -> {
-+            try {
-+                synchronized (this) {
-+                    if (!this.close) {
-+                        this.flush();
-+                    }
-+                }
-+            } catch (IOException e) {
-+                throw new RuntimeException(e);
-+            }
-+        }, this.computeSavePriority());
-+
-+        created.queue();
-+
-+        this.ioTask = created;
++    public double getLoadPercent() {
++        return ((double)this.modifiedChunkCount.get()) / (32 * 32);
 +    }
 +
 +    public DataOutputStream getChunkDataOutputStream(ChunkPos pos) {
@@ -683,6 +624,7 @@ index 0000000000000000000000000000000000000000..4a8a71686dddfc6b0c27882d1f73b92c
 +        openRegionFile();
 +        close = true;
 +        try {
++            if (this.ioTask != null) this.ioTask.cancel(false);
 +            flush();
 +        } catch(IOException e) {
 +            throw new IOException("Region flush IOException " + e + " " + this.regionFile);
@@ -738,6 +680,67 @@ index 0000000000000000000000000000000000000000..4a8a71686dddfc6b0c27882d1f73b92c
 +        }
 +    }
 +}
+diff --git a/src/main/java/abomination/LinearRegionFileFlusher.java b/src/main/java/abomination/LinearRegionFileFlusher.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b4e4b4a7fb8f37715b6a3099ec2c7f48d65f9390
+--- /dev/null
++++ b/src/main/java/abomination/LinearRegionFileFlusher.java
+@@ -0,0 +1,55 @@
++package abomination;
++
++import com.google.common.util.concurrent.ThreadFactoryBuilder;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.concurrent.ScheduledFuture;
++import java.util.concurrent.ScheduledThreadPoolExecutor;
++import java.util.concurrent.TimeUnit;
++
++public class LinearRegionFileFlusher {
++    private final ScheduledThreadPoolExecutor delayedIoSchedule;
++    private final long baseDelay;
++
++    public LinearRegionFileFlusher(int nThreads, long baseDelay) {
++        this.delayedIoSchedule = new ScheduledThreadPoolExecutor(nThreads,
++                new ThreadFactoryBuilder()
++                        .setPriority(3)
++                        .setNameFormat("Linear IO Thread - %d")
++                        .build()
++        );
++        this.baseDelay = baseDelay;
++    }
++
++    public void shutdown() {
++        this.delayedIoSchedule.shutdown();
++        while (true) {
++            try {
++                if (this.delayedIoSchedule.awaitTermination(1000, TimeUnit.MILLISECONDS)) break;
++            } catch (InterruptedException e) {
++                throw new RuntimeException(e);
++            }
++        }
++    }
++
++    public ScheduledFuture<?> claimTask(@Nullable ScheduledFuture<?> parent, @NotNull LinearRegionFile file){
++        if (parent != null) {
++            if (!parent.isCancelled() && !parent.isDone()) {
++                parent.cancel(false);
++            }
++        }
++
++        final double loadPercent = file.getLoadPercent() * 100;
++        final double delayOffset = Math.max(this.baseDelay, loadPercent * this.baseDelay);
++
++        final long actualDelay = (long) (this.baseDelay - delayOffset);
++        return this.delayedIoSchedule.schedule(() -> {
++            try {
++                file.flush();
++            }catch (Exception e) {
++                throw new RuntimeException(e);
++            }
++        }, actualDelay, java.util.concurrent.TimeUnit.MILLISECONDS);
++    }
++}
 diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/io/ChunkSystemRegionFileStorage.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/io/ChunkSystemRegionFileStorage.java
 index a814512fcfb85312474ae2c2c21443843bf57831..2e084a5b28cbe4737f48c25e10af589213525362 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/io/ChunkSystemRegionFileStorage.java
@@ -780,28 +783,35 @@ index 51c126735ace8fdde89ad97b5cab62f244212db0..c7d4d944eb198ac53a3eeae717a25c7d
  }
 diff --git a/src/main/java/me/earthme/luminol/config/modules/misc/RegionFormatConfig.java b/src/main/java/me/earthme/luminol/config/modules/misc/RegionFormatConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..60546260cd1d535cc596485de2ced48b7e045b3a
+index 0000000000000000000000000000000000000000..4dc62688fe2731f7b43d7f48c7cb76fef33821c1
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/config/modules/misc/RegionFormatConfig.java
-@@ -0,0 +1,48 @@
+@@ -0,0 +1,64 @@
 +package me.earthme.luminol.config.modules.misc;
 +
 +import abomination.LinearRegionFile;
++import abomination.LinearRegionFileFlusher;
 +import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-+import me.earthme.luminol.config.ConfigInfo;
-+import me.earthme.luminol.config.DoNotLoad;
-+import me.earthme.luminol.config.EnumConfigCategory;
-+import me.earthme.luminol.config.IConfigModule;
++import me.earthme.luminol.config.*;
 +import me.earthme.luminol.utils.EnumRegionFormat;
 +import net.minecraft.server.MinecraftServer;
 +
 +public class RegionFormatConfig implements IConfigModule {
++    @HotReloadUnsupported
 +    @ConfigInfo(baseName = "format")
 +    public static String format = "MCA";
++    @HotReloadUnsupported
 +    @ConfigInfo(baseName = "linear_compression_level")
 +    public static int linearCompressionLevel = 1;
++    @HotReloadUnsupported
 +    @ConfigInfo(baseName = "linear_io_thread_count")
 +    public static int linearIoThreadCount = 6;
++    @HotReloadUnsupported
++    @ConfigInfo(baseName = "linear_io_flush_delay_ms")
++    public static int linearIoFlushDelayMs = 100;
++
++    @DoNotLoad
++    public static LinearRegionFileFlusher linearFlusher;
 +
 +    @DoNotLoad
 +    public static EnumRegionFormat regionFormat;
@@ -818,7 +828,6 @@ index 0000000000000000000000000000000000000000..60546260cd1d535cc596485de2ced48b
 +
 +    @Override
 +    public void onLoaded(CommentedFileConfig configInstance) {
-+        LinearRegionFile.initIOExecutor();
 +        regionFormat = EnumRegionFormat.fromString(format.toUpperCase());
 +
 +        if (regionFormat == null) {
@@ -829,6 +838,16 @@ index 0000000000000000000000000000000000000000..60546260cd1d535cc596485de2ced48b
 +            MinecraftServer.LOGGER.error("Linear region compression level should be between 1 and 22 in config: {}", RegionFormatConfig.linearCompressionLevel);
 +            MinecraftServer.LOGGER.error("Falling back to compression level 1.");
 +            RegionFormatConfig.linearCompressionLevel = 1;
++        }
++
++        if (regionFormat == EnumRegionFormat.LINEAR_V2) {
++            linearFlusher = new LinearRegionFileFlusher(RegionFormatConfig.linearIoThreadCount, RegionFormatConfig.linearIoFlushDelayMs);
++        }
++    }
++
++    public static void shutdownLinearIOPool() {
++        if (linearFlusher != null) {
++            linearFlusher.shutdown();
 +        }
 +    }
 +}
@@ -907,14 +926,27 @@ index 0000000000000000000000000000000000000000..5af068489646ed70330d8c6242ec88f5
 +
 +public record RegionCreatorInfo (RegionStorageInfo info, Path filePath, Path folder, boolean sync) {}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 8cc0c01a19fc71753d7c3ed4fa7e9992aaf93b5a..88be8a6232bc3311cc0bdb7c697f7a78ce33e38d 100644
+index 8cc0c01a19fc71753d7c3ed4fa7e9992aaf93b5a..ad79dee048a57be6a6997a38195d636ce952c48d 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -1036,10 +1036,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             while (iterator1.hasNext()) {
+                 ServerLevel worldserver2 = (ServerLevel) iterator1.next();
+ 
+-                MinecraftServer.LOGGER.info("ThreadedAnvilChunkStorage ({}): All chunks are saved", worldserver2.getChunkSource().chunkMap.getStorageName());
++                MinecraftServer.LOGGER.info("ThreadedChunkStorage ({}): All chunks are saved", worldserver2.getChunkSource().chunkMap.getStorageName()); // Luminol - configurable region format
+             }
+ 
+-            MinecraftServer.LOGGER.info("ThreadedAnvilChunkStorage: All dimensions are saved");
++            MinecraftServer.LOGGER.info("ThreadedChunkStorage: All dimensions are saved"); // Luminol - configurable region format
+         }
+ 
+         return flag3;
 @@ -1180,6 +1180,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          this.saveAllChunks(false, true, true, true); // Paper - rewrite chunk system
  
          this.isSaving = false;
-+        abomination.LinearRegionFile.shutdownIOExecutor(); // Luminol - Linear region file format
++        me.earthme.luminol.config.modules.misc.RegionFormatConfig.linearFlusher.shutdown(); // Luminol - Linear region file format
          // Folia start - region threading
          this.stopPart2();
      }
