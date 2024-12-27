@@ -179,10 +179,10 @@ index de2f03d6e771c09e8da2da454b7ec4a16c0a17ab..0b7347e8fdf995900221ee4aa4e97a4d
          if (mspt == -1){
              return BossBar.Color.valueOf(TpsBarConfig.tpsColors.get(3));
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index c7390e0341cd19fa5e0b21882f27943174f718d0..19e1dfbcd69e3f960d148b014e9e9248072918a2 100644
+index 55bac6e6cccce6e0282936ac78bbe82628daa655..2cff9edf247587dffaac5405127de0afc17dc7c0 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1802,6 +1802,29 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1801,6 +1801,29 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              } finally { foliaProfiler.stopTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.ENTITY_SCHEDULER_TICK); } // Folia - profiler
          }
          // Folia end - region threading
@@ -212,7 +212,7 @@ index c7390e0341cd19fa5e0b21882f27943174f718d0..19e1dfbcd69e3f960d148b014e9e9248
          if (region == null) this.tickRateManager.tick(); // Folia - region threading
          this.tickChildren(shouldKeepTicking, region); // Folia - region threading
          if (region == null && i - this.lastServerStatus >= MinecraftServer.STATUS_EXPIRE_TIME_NANOS) { // Folia - region threading
-@@ -1810,6 +1833,20 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1809,6 +1832,20 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
  
          // Folia - region threading
@@ -332,7 +332,7 @@ index 921527acc8624536f4a48e9fdf7fce370bc52c77..497de02dce0f397ce261b4d62777e11f
 +    // KioCG end
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 3b2bce1b5261a0efbbfcd7d38bf7f093d97df3a6..2d9f75526240689facba1a4fbef7d40ef8299a1d 100644
+index b6aaa238626bc747379f991c17c279de52907083..3700f7c1893e9ccdcef04ae1fab5d7c97c5a91d7 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -6236,4 +6236,6 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess

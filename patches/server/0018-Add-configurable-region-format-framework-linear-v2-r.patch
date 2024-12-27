@@ -68,17 +68,16 @@ index 0000000000000000000000000000000000000000..d92f1d549c7e01daa6b5bba7d405e462
 +}
 diff --git a/src/main/java/abomination/LinearRegionFile.java b/src/main/java/abomination/LinearRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856d79a6a38
+index 0000000000000000000000000000000000000000..bb0fcf5f47b5ae3d86e1d0572f951236afdcd017
 --- /dev/null
 +++ b/src/main/java/abomination/LinearRegionFile.java
-@@ -0,0 +1,608 @@
+@@ -0,0 +1,622 @@
 +package abomination;
 +
 +import ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO;
 +import com.github.luben.zstd.ZstdInputStream;
 +import com.github.luben.zstd.ZstdOutputStream;
 +import com.mojang.logging.LogUtils;
-+import me.earthme.luminol.config.modules.misc.RegionFormatConfig;
 +import net.jpountz.lz4.LZ4Compressor;
 +import net.jpountz.lz4.LZ4Factory;
 +import net.jpountz.lz4.LZ4FastDecompressor;
@@ -95,8 +94,11 @@ index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856
 +import java.nio.file.Files;
 +import java.nio.file.Path;
 +import java.nio.file.StandardCopyOption;
-+import java.util.concurrent.ScheduledFuture;
-+import java.util.concurrent.atomic.AtomicInteger;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.List;
++import java.util.concurrent.TimeUnit;
++import java.util.concurrent.locks.LockSupport;
 +import java.util.concurrent.locks.ReentrantLock;
 +
 +// LinearRegionFile_implementation_version_0_5byXymb
@@ -127,9 +129,7 @@ index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856
 +    private final int compressionLevel;
 +    private int gridSize = 8;
 +    private int bucketSize = 4;
-+
-+    private final AtomicInteger modifiedChunkCount = new AtomicInteger(0);
-+    private ScheduledFuture<?> ioTask = null;
++    private final Thread bindThread;
 +
 +    public Path getRegionFile() {
 +        return this.regionFile;
@@ -199,7 +199,7 @@ index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856
 +        File regionFile = new File(this.regionFile.toString());
 +
 +        if(!regionFile.canRead()) {
-+            //this.start();
++            this.bindThread.start();
 +            return;
 +        }
 +
@@ -220,7 +220,7 @@ index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856
 +                throw new RuntimeException("Invalid version: " + version + " file " + this.regionFile);
 +            }
 +
-+            //this.start();
++            this.bindThread.start();
 +        } catch (IOException e) {
 +            throw new RuntimeException("Failed to open region file " + this.regionFile, e);
 +        }
@@ -324,6 +324,35 @@ index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856
 +    }
 +
 +    public LinearRegionFile(RegionStorageInfo storageKey, Path path, Path directory, RegionFileVersion compressionFormat, boolean dsync, int compressionLevel) throws IOException {
++        Runnable flushCheck = () -> {
++            while (!close) {
++                synchronized (saveLock) {
++                    if (markedToSave && activeSaveThreads < SAVE_THREAD_MAX_COUNT) {
++                        activeSaveThreads++;
++                        Runnable flushOperation = () -> {
++                            try {
++                                flush();
++                            } catch (IOException ex) {
++                                LOGGER.error("Region file {} flush failed", this.regionFile.toAbsolutePath(), ex);
++                            } finally {
++                                synchronized (saveLock) {
++                                    activeSaveThreads--;
++                                }
++                            }
++                        };
++
++                        Thread saveThread = USE_VIRTUAL_THREAD ?
++                                Thread.ofVirtual().name("Linear IO - " + LinearRegionFile.this.hashCode()).unstarted(flushOperation) :
++                                Thread.ofPlatform().name("Linear IO - " + LinearRegionFile.this.hashCode()).unstarted(flushOperation);
++                        saveThread.setPriority(Thread.NORM_PRIORITY - 3);
++                        saveThread.start();
++                    }
++                }
++                LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(SAVE_DELAY_MS));
++            }
++        };
++        this.bindThread = USE_VIRTUAL_THREAD ? Thread.ofVirtual().unstarted(flushCheck) : Thread.ofPlatform().unstarted(flushCheck);
++        this.bindThread.setName("Linear IO Schedule - " + this.hashCode());
 +        this.regionFile = path;
 +        this.compressionLevel = compressionLevel;
 +
@@ -347,36 +376,34 @@ index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856
 +        }
 +    }
 +
-+    /*
-+    private static final int SAVE_THREAD_MAX_COUNT = 6;
++    public static int SAVE_THREAD_MAX_COUNT = 6;
++    public static int SAVE_DELAY_MS = 100;
++    public static boolean USE_VIRTUAL_THREAD = true;
 +    private static final Object saveLock = new Object();
 +    private static int activeSaveThreads = 0;
-+    */
 +
 +    /*public void run() {
-+        try {
-+            while (!close) {
-+                synchronized (saveLock) {
-+                    if (markedToSave && activeSaveThreads < SAVE_THREAD_MAX_COUNT) {
-+                        activeSaveThreads++;
-+                        Thread saveThread = new Thread(() -> {
-+                            try {
-+                                flush();
-+                            } catch (IOException ex) {
-+                                LOGGER.error("Region file " + this.regionFile.toAbsolutePath() + " flush failed", ex);
-+                            } finally {
-+                                synchronized (saveLock) {
-+                                    activeSaveThreads--;
-+                                }
++        while (!close) {
++            synchronized (saveLock) {
++                if (markedToSave && activeSaveThreads < SAVE_THREAD_MAX_COUNT) {
++                    activeSaveThreads++;
++                    Thread saveThread = new Thread(() -> {
++                        try {
++                            flush();
++                        } catch (IOException ex) {
++                            LOGGER.error("Region file " + this.regionFile.toAbsolutePath() + " flush failed", ex);
++                        } finally {
++                            synchronized (saveLock) {
++                                activeSaveThreads--;
 +                            }
-+                        }, "RegionFileFlush");
-+                        saveThread.setPriority(Thread.NORM_PRIORITY - 3);
-+                        saveThread.start();
-+                    }
++                        }
++                    }, "RegionFileFlush");
++                    saveThread.setPriority(Thread.NORM_PRIORITY - 3);
++                    saveThread.start();
 +                }
-+                Thread.sleep(100);
 +            }
-+        } catch(InterruptedException ignored) {}
++            LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(SAVE_DELAY_MS));
++        }
 +    }*/
 +
 +    public synchronized boolean doesChunkExist(ChunkPos pos) throws Exception {
@@ -391,7 +418,7 @@ index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856
 +
 +        long timestamp = getTimestamp();
 +
-+        long writeStart = System.nanoTime();
++long writeStart = System.nanoTime();
 +        File tempFile = new File(regionFile.toString() + ".tmp");
 +        FileOutputStream fileStream = new FileOutputStream(tempFile);
 +        DataOutputStream dataStream = new DataOutputStream(fileStream);
@@ -492,7 +519,6 @@ index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856
 +        fileStream.close();
 +        Files.move(tempFile.toPath(), this.regionFile, StandardCopyOption.REPLACE_EXISTING);
 +//System.out.println("writeStart REGION FILE FLUSH " + (System.nanoTime() - writeStart) + " misses: " + bucketMisses);
-+        this.modifiedChunkCount.set(0);
 +    }
 +
 +    private void writeNBTFeatures(DataOutputStream dataStream) throws IOException {
@@ -535,17 +561,6 @@ index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856
 +            LOGGER.error("Chunk write IOException " + e + " " + this.regionFile);
 +        }
 +        markToSave();
-+        this.modifiedChunkCount.getAndIncrement();
-+
-+        this.ioTask = RegionFormatConfig.linearFlusher.claimTask(this.ioTask, this);
-+    }
-+
-+    public synchronized boolean isClosed() {
-+        return this.close;
-+    }
-+
-+    public double getLoadPercent() {
-+        return ((double)this.modifiedChunkCount.get()) / (32 * 32);
 +    }
 +
 +    public DataOutputStream getChunkDataOutputStream(ChunkPos pos) {
@@ -624,7 +639,6 @@ index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856
 +        openRegionFile();
 +        close = true;
 +        try {
-+            if (this.ioTask != null) this.ioTask.cancel(false);
 +            flush();
 +        } catch(IOException e) {
 +            throw new IOException("Region flush IOException " + e + " " + this.regionFile);
@@ -680,67 +694,6 @@ index 0000000000000000000000000000000000000000..9fdc9aa840c6b2ae027bcf84a2b77856
 +        }
 +    }
 +}
-diff --git a/src/main/java/abomination/LinearRegionFileFlusher.java b/src/main/java/abomination/LinearRegionFileFlusher.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..b4e4b4a7fb8f37715b6a3099ec2c7f48d65f9390
---- /dev/null
-+++ b/src/main/java/abomination/LinearRegionFileFlusher.java
-@@ -0,0 +1,55 @@
-+package abomination;
-+
-+import com.google.common.util.concurrent.ThreadFactoryBuilder;
-+import org.jetbrains.annotations.NotNull;
-+import org.jetbrains.annotations.Nullable;
-+
-+import java.util.concurrent.ScheduledFuture;
-+import java.util.concurrent.ScheduledThreadPoolExecutor;
-+import java.util.concurrent.TimeUnit;
-+
-+public class LinearRegionFileFlusher {
-+    private final ScheduledThreadPoolExecutor delayedIoSchedule;
-+    private final long baseDelay;
-+
-+    public LinearRegionFileFlusher(int nThreads, long baseDelay) {
-+        this.delayedIoSchedule = new ScheduledThreadPoolExecutor(nThreads,
-+                new ThreadFactoryBuilder()
-+                        .setPriority(3)
-+                        .setNameFormat("Linear IO Thread - %d")
-+                        .build()
-+        );
-+        this.baseDelay = baseDelay;
-+    }
-+
-+    public void shutdown() {
-+        this.delayedIoSchedule.shutdown();
-+        while (true) {
-+            try {
-+                if (this.delayedIoSchedule.awaitTermination(1000, TimeUnit.MILLISECONDS)) break;
-+            } catch (InterruptedException e) {
-+                throw new RuntimeException(e);
-+            }
-+        }
-+    }
-+
-+    public ScheduledFuture<?> claimTask(@Nullable ScheduledFuture<?> parent, @NotNull LinearRegionFile file){
-+        if (parent != null) {
-+            if (!parent.isCancelled() && !parent.isDone()) {
-+                parent.cancel(false);
-+            }
-+        }
-+
-+        final double loadPercent = file.getLoadPercent() * 100;
-+        final double delayOffset = Math.max(this.baseDelay, loadPercent * this.baseDelay);
-+
-+        final long actualDelay = (long) (this.baseDelay - delayOffset);
-+        return this.delayedIoSchedule.schedule(() -> {
-+            try {
-+                file.flush();
-+            }catch (Exception e) {
-+                throw new RuntimeException(e);
-+            }
-+        }, actualDelay, java.util.concurrent.TimeUnit.MILLISECONDS);
-+    }
-+}
 diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/io/ChunkSystemRegionFileStorage.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/io/ChunkSystemRegionFileStorage.java
 index a814512fcfb85312474ae2c2c21443843bf57831..2e084a5b28cbe4737f48c25e10af589213525362 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/io/ChunkSystemRegionFileStorage.java
@@ -783,14 +736,13 @@ index 51c126735ace8fdde89ad97b5cab62f244212db0..c7d4d944eb198ac53a3eeae717a25c7d
  }
 diff --git a/src/main/java/me/earthme/luminol/config/modules/misc/RegionFormatConfig.java b/src/main/java/me/earthme/luminol/config/modules/misc/RegionFormatConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4dc62688fe2731f7b43d7f48c7cb76fef33821c1
+index 0000000000000000000000000000000000000000..eb689b6b79143ffaf1eadcba84feca0c632d1407
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/config/modules/misc/RegionFormatConfig.java
-@@ -0,0 +1,64 @@
+@@ -0,0 +1,59 @@
 +package me.earthme.luminol.config.modules.misc;
 +
 +import abomination.LinearRegionFile;
-+import abomination.LinearRegionFileFlusher;
 +import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 +import me.earthme.luminol.config.*;
 +import me.earthme.luminol.utils.EnumRegionFormat;
@@ -809,9 +761,9 @@ index 0000000000000000000000000000000000000000..4dc62688fe2731f7b43d7f48c7cb76fe
 +    @HotReloadUnsupported
 +    @ConfigInfo(baseName = "linear_io_flush_delay_ms")
 +    public static int linearIoFlushDelayMs = 100;
-+
-+    @DoNotLoad
-+    public static LinearRegionFileFlusher linearFlusher;
++    @HotReloadUnsupported
++    @ConfigInfo(baseName = "linear_use_virtual_thread")
++    public static boolean linearUseVirtualThread = true;
 +
 +    @DoNotLoad
 +    public static EnumRegionFormat regionFormat;
@@ -834,20 +786,16 @@ index 0000000000000000000000000000000000000000..4dc62688fe2731f7b43d7f48c7cb76fe
 +            throw new RuntimeException("Invalid region format: " + format);
 +        }
 +
-+        if (RegionFormatConfig.linearCompressionLevel > 23 || RegionFormatConfig.linearCompressionLevel < 1) {
-+            MinecraftServer.LOGGER.error("Linear region compression level should be between 1 and 22 in config: {}", RegionFormatConfig.linearCompressionLevel);
-+            MinecraftServer.LOGGER.error("Falling back to compression level 1.");
-+            RegionFormatConfig.linearCompressionLevel = 1;
-+        }
-+
 +        if (regionFormat == EnumRegionFormat.LINEAR_V2) {
-+            linearFlusher = new LinearRegionFileFlusher(RegionFormatConfig.linearIoThreadCount, RegionFormatConfig.linearIoFlushDelayMs);
-+        }
-+    }
++            if (RegionFormatConfig.linearCompressionLevel > 23 || RegionFormatConfig.linearCompressionLevel < 1) {
++                MinecraftServer.LOGGER.error("Linear region compression level should be between 1 and 22 in config: {}", RegionFormatConfig.linearCompressionLevel);
++                MinecraftServer.LOGGER.error("Falling back to compression level 1.");
++                RegionFormatConfig.linearCompressionLevel = 1;
++            }
 +
-+    public static void shutdownLinearIOPool() {
-+        if (linearFlusher != null) {
-+            linearFlusher.shutdown();
++            LinearRegionFile.SAVE_DELAY_MS = linearIoFlushDelayMs;
++            LinearRegionFile.SAVE_THREAD_MAX_COUNT = linearIoThreadCount;
++            LinearRegionFile.USE_VIRTUAL_THREAD = linearUseVirtualThread;
 +        }
 +    }
 +}
@@ -926,7 +874,7 @@ index 0000000000000000000000000000000000000000..5af068489646ed70330d8c6242ec88f5
 +
 +public record RegionCreatorInfo (RegionStorageInfo info, Path filePath, Path folder, boolean sync) {}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 8cc0c01a19fc71753d7c3ed4fa7e9992aaf93b5a..ad79dee048a57be6a6997a38195d636ce952c48d 100644
+index 8cc0c01a19fc71753d7c3ed4fa7e9992aaf93b5a..04f68856cb3d982f1644d26f5ae57587b6e36ff2 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1036,10 +1036,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -942,14 +890,6 @@ index 8cc0c01a19fc71753d7c3ed4fa7e9992aaf93b5a..ad79dee048a57be6a6997a38195d636c
          }
  
          return flag3;
-@@ -1180,6 +1180,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-         this.saveAllChunks(false, true, true, true); // Paper - rewrite chunk system
- 
-         this.isSaving = false;
-+        me.earthme.luminol.config.modules.misc.RegionFormatConfig.linearFlusher.shutdown(); // Luminol - Linear region file format
-         // Folia start - region threading
-         this.stopPart2();
-     }
 diff --git a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 index 622d0cbe023774d92d212f242b60b96317720835..9b4b01a741e8779f4ea06b0fd801ce243e179910 100644
 --- a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
