@@ -4,21 +4,6 @@ Date: Wed, 7 Feb 2024 04:50:10 +0000
 Subject: [PATCH] Add config for username check
 
 
-diff --git a/src/main/java/com/destroystokyo/paper/profile/CraftPlayerProfile.java b/src/main/java/com/destroystokyo/paper/profile/CraftPlayerProfile.java
-index 8849862b45ccbbc635a1c316e9870bca81e55c04..774521cf327592adeef67f3fb8f6334e0b7de799 100644
---- a/src/main/java/com/destroystokyo/paper/profile/CraftPlayerProfile.java
-+++ b/src/main/java/com/destroystokyo/paper/profile/CraftPlayerProfile.java
-@@ -294,8 +294,8 @@ public class CraftPlayerProfile implements PlayerProfile, SharedPlayerProfile {
-     }
- 
-     private static GameProfile createAuthLibProfile(UUID uniqueId, String name) {
--        Preconditions.checkArgument(name == null || name.length() <= 16, "Name cannot be longer than 16 characters");
--        Preconditions.checkArgument(name == null || StringUtil.isValidPlayerName(name), "The name of the profile contains invalid characters: %s", name);
-+        Preconditions.checkArgument(name == null || name.length() <= 16 || !me.earthme.luminol.config.modules.misc.UsernameCheckConfig.enabled, "Name cannot be longer than 16 characters");
-+        Preconditions.checkArgument(name == null || StringUtil.isValidPlayerName(name) ||  !me.earthme.luminol.config.modules.misc.UsernameCheckConfig.enabled, "The name of the profile contains invalid characters: %s", name);
-         return new GameProfile(
-             uniqueId != null ? uniqueId : Util.NIL_UUID,
-             name != null ? name : ""
 diff --git a/src/main/java/me/earthme/luminol/config/modules/misc/UsernameCheckConfig.java b/src/main/java/me/earthme/luminol/config/modules/misc/UsernameCheckConfig.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..c7e4724cc4ab8d911bcaf0106c098b266c843bb1
@@ -46,7 +31,7 @@ index 0000000000000000000000000000000000000000..c7e4724cc4ab8d911bcaf0106c098b26
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-index 227d62a69a453d49c28568ecb41ecef85a35405b..d1f70437eb43dd536e7b3dac7a770525eff55318 100644
+index 227d62a69a453d49c28568ecb41ecef85a35405b..8951397adcc5505304d0dece6435aab786017399 100644
 --- a/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
 @@ -178,7 +178,8 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
@@ -54,30 +39,39 @@ index 227d62a69a453d49c28568ecb41ecef85a35405b..d1f70437eb43dd536e7b3dac7a770525
          Validate.validState(this.state == ServerLoginPacketListenerImpl.State.HELLO, "Unexpected hello packet", new Object[0]);
          // Paper start - Validate usernames
 -        if (io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()
-+        if (me.earthme.luminol.config.modules.misc.UsernameCheckConfig.enabled //Luminol - Add config for username check
++        if (me.earthme.luminol.config.modules.misc.UsernameCheckConfig.enabled // Luminol - Add config for username check
 +            && io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()
              && io.papermc.paper.configuration.GlobalConfiguration.get().unsupportedSettings.performUsernameValidation
              && !this.iKnowThisMayNotBeTheBestIdeaButPleaseDisableUsernameValidation) {
              Validate.validState(StringUtil.isReasonablePlayerName(packet.name()), "Invalid characters in username", new Object[0]);
-diff --git a/src/main/java/org/bukkit/craftbukkit/profile/CraftPlayerProfile.java b/src/main/java/org/bukkit/craftbukkit/profile/CraftPlayerProfile.java
-index f58dec12326734c61f4bc2298a87fb38f1ac1dc4..249ecfb1b1830befa43ba172c65527b077bb8f4e 100644
---- a/src/main/java/org/bukkit/craftbukkit/profile/CraftPlayerProfile.java
-+++ b/src/main/java/org/bukkit/craftbukkit/profile/CraftPlayerProfile.java
-@@ -42,7 +42,7 @@ public final class CraftPlayerProfile implements PlayerProfile, com.destroystoky
-         Preconditions.checkArgument(isValidSkullProfile, "The skull profile is missing a name or textures!");
-         // Paper start - Validate
-         Preconditions.checkArgument(gameProfile.getName().length() <= 16, "The name of the profile is longer than 16 characters");
--        Preconditions.checkArgument(net.minecraft.util.StringUtil.isValidPlayerName(gameProfile.getName()), "The name of the profile contains invalid characters: %s", gameProfile.getName());
-+        Preconditions.checkArgument(!me.earthme.luminol.config.modules.misc.UsernameCheckConfig.enabled || net.minecraft.util.StringUtil.isValidPlayerName(gameProfile.getName()), "The name of the profile contains invalid characters: %s", gameProfile.getName()); // Luminol - Add config for username checks
-         final PropertyMap properties = gameProfile.getProperties();
-         Preconditions.checkArgument(properties.size() <= 16, "The profile contains more than 16 properties");
-         for (final Property property : properties.values()) {
-@@ -79,7 +79,7 @@ public final class CraftPlayerProfile implements PlayerProfile, com.destroystoky
-             Preconditions.checkArgument((uniqueId != null) || !StringUtils.isBlank(name), "uniqueId is null or name is blank");
-         }
-         Preconditions.checkArgument(name == null || name.length() <= 16, "The name of the profile is longer than 16 characters"); // Paper - Validate
--        Preconditions.checkArgument(name == null || net.minecraft.util.StringUtil.isValidPlayerName(name), "The name of the profile contains invalid characters: %s", name); // Paper - Validate
-+        Preconditions.checkArgument(!me.earthme.luminol.config.modules.misc.UsernameCheckConfig.enabled || name == null || net.minecraft.util.StringUtil.isValidPlayerName(name), "The name of the profile contains invalid characters: %s", name); // Paper - Validate // Luminol - Add config for username checks
-         this.uniqueId = uniqueId;
-         this.name = name;
+diff --git a/src/main/java/net/minecraft/server/players/GameProfileCache.java b/src/main/java/net/minecraft/server/players/GameProfileCache.java
+index 34b4166adfae8ff7d1eb73d56a72931b005330a7..fc95632268caa8941dcce7a575ce00303864c4c1 100644
+--- a/src/main/java/net/minecraft/server/players/GameProfileCache.java
++++ b/src/main/java/net/minecraft/server/players/GameProfileCache.java
+@@ -82,7 +82,7 @@ public class GameProfileCache {
      }
+ 
+     private static Optional<GameProfile> lookupGameProfile(GameProfileRepository repository, String name) {
+-        if (!StringUtil.isValidPlayerName(name)) {
++        if (!StringUtil.isValidPlayerName(name, false)) { // Luminol - Add config for username check - Directly return, skip unnecessary following logic
+             return GameProfileCache.createUnknownProfile(name);
+         } else {
+             final AtomicReference<GameProfile> atomicreference = new AtomicReference();
+diff --git a/src/main/java/net/minecraft/util/StringUtil.java b/src/main/java/net/minecraft/util/StringUtil.java
+index 6c33002dc8bbb3759c3156302ab7d1f26ce5e8ee..8caf8dd187dfdc67a8b97db080a9fe0ef5234943 100644
+--- a/src/main/java/net/minecraft/util/StringUtil.java
++++ b/src/main/java/net/minecraft/util/StringUtil.java
+@@ -64,6 +64,13 @@ public class StringUtil {
+     }
+ 
+     public static boolean isValidPlayerName(String name) {
++        // Luminol start - Add config for username check
++        return isValidPlayerName(name, !me.earthme.luminol.config.modules.misc.UsernameCheckConfig.enabled);
++    }
++
++    public static boolean isValidPlayerName(String name, boolean bypassCheck) {
++        if (bypassCheck) return name.length() <= 16;
++        // Luminol end - Add config for username check
+         return name.length() <= 16 && name.chars().filter(c -> c <= 32 || c >= 127).findAny().isEmpty();
+     }
+ 
