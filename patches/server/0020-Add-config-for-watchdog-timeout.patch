@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrHua269 <wangxyper@163.com>
+Date: Tue, 31 Dec 2024 17:45:55 +0800
+Subject: [PATCH] Add config for watchdog timeout
+
+
+diff --git a/src/main/java/io/papermc/paper/threadedregions/FoliaWatchdogThread.java b/src/main/java/io/papermc/paper/threadedregions/FoliaWatchdogThread.java
+index 258d82ab2c78482e1561343e8e1f81fc33f1895e..967107c0f4a18a29877883ccddb4d7962f4b5788 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/FoliaWatchdogThread.java
++++ b/src/main/java/io/papermc/paper/threadedregions/FoliaWatchdogThread.java
+@@ -65,7 +65,7 @@ public final class FoliaWatchdogThread extends Thread {
+ 
+             for (final RunningTick tick : ticks) {
+                 final long elapsed = now - tick.lastPrint;
+-                if (elapsed <= TimeUnit.SECONDS.toNanos(5L)) {
++                if (elapsed <= TimeUnit.MILLISECONDS.toNanos(me.earthme.luminol.config.modules.misc.FoliaWatchogConfig.tickRegionTimeOutMs)) { // Luminol - Add config for watchdog timeout
+                     continue;
+                 }
+                 tick.lastPrint = now;
+diff --git a/src/main/java/me/earthme/luminol/config/modules/misc/FoliaWatchogConfig.java b/src/main/java/me/earthme/luminol/config/modules/misc/FoliaWatchogConfig.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..de58b5bf9dedf35bc56a9211d0769b988704a7fe
+--- /dev/null
++++ b/src/main/java/me/earthme/luminol/config/modules/misc/FoliaWatchogConfig.java
+@@ -0,0 +1,20 @@
++package me.earthme.luminol.config.modules.misc;
++
++import me.earthme.luminol.config.ConfigInfo;
++import me.earthme.luminol.config.EnumConfigCategory;
++import me.earthme.luminol.config.IConfigModule;
++
++public class FoliaWatchogConfig implements IConfigModule {
++    @ConfigInfo(baseName = "tick_region_time_out_ms")
++    public static int tickRegionTimeOutMs = 5000;
++
++    @Override
++    public EnumConfigCategory getCategory() {
++        return EnumConfigCategory.MISC;
++    }
++
++    @Override
++    public String getBaseName() {
++        return "folia_watchdog";
++    }
++}
