@@ -719,7 +719,7 @@ index 1acea58838f057ab87efd103cbecb6f5aeaef393..f9b89684208b9fe2c93f0368f7df5a40
          public static interface IORunnable {
  
 -            public void run(final RegionFile regionFile) throws IOException;
-+            public void run(final abomination.IRegionFile regionFile) throws IOException;
++            public void run(final abomination.IRegionFile regionFile) throws IOException; // Luminol - Configurable region file format
  
          }
      }
@@ -917,7 +917,7 @@ index 622d0cbe023774d92d212f242b60b96317720835..9b4b01a741e8779f4ea06b0fd801ce24
  
                          try {
 -                            RegionFile regionfile = new RegionFile(key, file.toPath(), regionDirectory, true);
-+                            abomination.IRegionFile regionfile = net.minecraft.world.level.chunk.storage.RegionFileStorage.createNew(key, file.toPath(), regionDirectory, true);
++                            abomination.IRegionFile regionfile = net.minecraft.world.level.chunk.storage.RegionFileStorage.createNew(key, file.toPath(), regionDirectory, true); // Luminol - Configurable region file format
  
                              try {
                                  for (int i1 = 0; i1 < 32; ++i1) {
@@ -926,7 +926,7 @@ index 622d0cbe023774d92d212f242b60b96317720835..9b4b01a741e8779f4ea06b0fd801ce24
          protected abstract boolean tryProcessOnePosition(T storage, ChunkPos chunkPos, ResourceKey<Level> worldKey);
  
 -        private void onFileFinished(RegionFile regionFile) {
-+        private void onFileFinished(abomination.IRegionFile regionFile) {
++        private void onFileFinished(abomination.IRegionFile regionFile) { // Luminol - Configurable region file format
              if (WorldUpgrader.this.recreateRegionFiles) {
                  if (this.previousWriteFuture != null) {
                      this.previousWriteFuture.join();
@@ -935,7 +935,7 @@ index 622d0cbe023774d92d212f242b60b96317720835..9b4b01a741e8779f4ea06b0fd801ce24
      }
  
 -    static record FileToUpgrade(RegionFile file, List<ChunkPos> chunksToUpgrade) {
-+    static record FileToUpgrade(abomination.IRegionFile file, List<ChunkPos> chunksToUpgrade) {
++    static record FileToUpgrade(abomination.IRegionFile file, List<ChunkPos> chunksToUpgrade) { // Luminol - Configurable region file format
  
      }
  
@@ -1136,7 +1136,7 @@ index e40665cead218502b44dd49051a53326ed94f061..a25e1bfd74b7ec9d6fcc3fe7c4369bc2
              FileUtil.createDirectoriesSafe(this.folder);
  
 -            ret = new RegionFile(this.info, regionPath, this.folder, this.sync);
-+            ret = this.createNew(this.info, regionPath, this.folder, this.sync);
++            ret = this.createNew(this.info, regionPath, this.folder, this.sync); // Luminol - Configurable region file format
  
              this.regionCache.putAndMoveToFirst(key, ret);
  
