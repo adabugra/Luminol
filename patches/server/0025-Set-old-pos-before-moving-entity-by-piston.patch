@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrHua269 <wangxyper@163.com>
+Date: Wed, 1 Jan 2025 12:18:18 +0800
+Subject: [PATCH] Set old pos before moving entity by piston
+
+
+diff --git a/src/main/java/me/earthme/luminol/config/modules/fixes/FoliaPistonIssueFixConfig.java b/src/main/java/me/earthme/luminol/config/modules/fixes/FoliaPistonIssueFixConfig.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..6edfb1d36a88d319151d28ba14873269736f84b6
+--- /dev/null
++++ b/src/main/java/me/earthme/luminol/config/modules/fixes/FoliaPistonIssueFixConfig.java
+@@ -0,0 +1,20 @@
++package me.earthme.luminol.config.modules.fixes;
++
++import me.earthme.luminol.config.ConfigInfo;
++import me.earthme.luminol.config.EnumConfigCategory;
++import me.earthme.luminol.config.IConfigModule;
++
++public class FoliaPistonIssueFixConfig implements IConfigModule {
++    @ConfigInfo(baseName = "enabled")
++    public static boolean enabled = false;
++
++    @Override
++    public EnumConfigCategory getCategory() {
++        return EnumConfigCategory.FIXES;
++    }
++
++    @Override
++    public String getBaseName() {
++        return "folia.fix_piston_moving_issue";
++    }
++}
+diff --git a/src/main/java/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java b/src/main/java/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
+index c3a04ef842630b3df447dea48b84bccde0c89e83..9545f46c22cb7dcdf2412f9a741dc51be40faace 100644
+--- a/src/main/java/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
+@@ -195,6 +195,7 @@ public class PistonMovingBlockEntity extends BlockEntity {
+ 
+     private static void moveEntityByPiston(Direction direction, Entity entity, double distance, Direction movementDirection) {
+         NOCLIP.set(direction);
++        if (me.earthme.luminol.config.modules.fixes.FoliaPistonIssueFixConfig.enabled) entity.setOldPosAndRot(); // Luminol- Try fixing folia issue #311
+         entity.move(
+             MoverType.PISTON,
+             new Vec3(
