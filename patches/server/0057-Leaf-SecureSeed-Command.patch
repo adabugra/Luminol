@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: adabugra <57899270+adabugra@users.noreply.github.com>
+Date: Sun, 5 Jan 2025 12:40:06 +0300
+Subject: [PATCH] Leaf: SecureSeed Command
+
+
+diff --git a/src/main/java/net/minecraft/server/commands/SeedCommand.java b/src/main/java/net/minecraft/server/commands/SeedCommand.java
+index 0b500b19a99fa6c2740c0db350a166462668df9c..1b82a5cc73cf7916146d6687a225256615551507 100644
+--- a/src/main/java/net/minecraft/server/commands/SeedCommand.java
++++ b/src/main/java/net/minecraft/server/commands/SeedCommand.java
+@@ -12,6 +12,17 @@ public class SeedCommand {
+             long l = context.getSource().getLevel().getSeed();
+             Component component = ComponentUtils.copyOnClickText(String.valueOf(l));
+             context.getSource().sendSuccess(() -> Component.translatable("commands.seed.success", component), false);
++
++            // Leaf start - Matter - SecureSeed Command
++            if (me.earthme.luminol.config.modules.misc.SecureSeedConfig.enabled) {
++                su.plo.matter.Globals.setupGlobals(context.getSource().getLevel());
++                String seedStr = su.plo.matter.Globals.seedToString(su.plo.matter.Globals.worldSeed);
++                Component featureSeedComponent = ComponentUtils.copyOnClickText(seedStr);
++
++                context.getSource().sendSuccess(() -> Component.translatable(("Feature seed: %s"), featureSeedComponent), false);
++            }
++            // Leaf end - Matter - SecureSeed Command
++
+             return (int)l;
+         }));
+     }
