@@ -195,7 +195,7 @@ index 0000000000000000000000000000000000000000..c01e5b5de685eca7edbe8a87732efd45
 +}
 diff --git a/src/main/java/me/earthme/luminol/config/modules/misc/SentryConfig.java b/src/main/java/me/earthme/luminol/config/modules/misc/SentryConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..270dfd41ebec4329977f771d3f3cdb99a211e483
+index 0000000000000000000000000000000000000000..55d6bb635b182d15471bfcd481a2b7c6ce26c00b
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/config/modules/misc/SentryConfig.java
 @@ -0,0 +1,47 @@
@@ -214,10 +214,10 @@ index 0000000000000000000000000000000000000000..270dfd41ebec4329977f771d3f3cdb99
 +                    " Obtain from https://sentry.io/")
 +    public static String sentryDsn = "";
 +
-+    @ConfigInfo(baseName = "log-level", comments = " Logs with a level higher than or equal to this level will be recorded.")
++    @ConfigInfo(baseName = "log_level", comments = " Logs with a level higher than or equal to this level will be recorded.")
 +    public static String logLevel = "WARN";
 +
-+    @ConfigInfo(baseName = "only-log-thrown", comments = " Only log with a Throwable will be recorded after enabling this.")
++    @ConfigInfo(baseName = "only_log_thrown", comments = " Only log with a Throwable will be recorded after enabling this.")
 +    public static boolean onlyLogThrown = true;
 +
 +    @Override
