@@ -88,12 +88,12 @@ index 04f68856cb3d982f1644d26f5ae57587b6e36ff2..55bac6e6cccce6e0282936ac78bbe826
          // Folia - region threading
          gameprofilerfiller.pop();
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 295504dab771c8bb8c668545fe5d62eae0561b76..49b4ef6457743b5f955bff70694378d4975e44a7 100644
+index e6db178f57b63a1abb72c965d4a6e67f97d3b570..3c26533876ffa1d06bbc4d68f2712b8c96e37351 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -225,7 +225,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Paper end - initialize global and world-defaults configuration
-         me.earthme.luminol.config.LuminolConfig.loadConfig(); //Luminol - load config file
+         me.earthme.luminol.config.LuminolConfig.finalizeLoadConfig(); //Luminol - load config file
          me.earthme.luminol.config.LuminolConfig.setupLatch(); //Luminol - load config file
 -        this.server.spark.enableEarlyIfRequested(); // Paper - spark
 +        if (false) this.server.spark.enableEarlyIfRequested(); // Paper - spark // Luminol - Force disable builtin spark

@@ -192,10 +192,10 @@ index 0000000000000000000000000000000000000000..9f6896711907ac30fe0c00130207b970
 +}
 diff --git a/src/main/java/me/earthme/luminol/config/LuminolConfig.java b/src/main/java/me/earthme/luminol/config/LuminolConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..fcacd381e4a5875ed0c542a9e6c1804fae823435
+index 0000000000000000000000000000000000000000..526b68e184a2f6f9e38cd02995b473a943404141
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/config/LuminolConfig.java
-@@ -0,0 +1,221 @@
+@@ -0,0 +1,226 @@
 +package me.earthme.luminol.config;
 +
 +import com.electronwill.nightconfig.core.file.CommentedFileConfig;
@@ -238,7 +238,8 @@ index 0000000000000000000000000000000000000000..fcacd381e4a5875ed0c542a9e6c1804f
 +
 +        dropAllInstanced();
 +        try {
-+            loadConfig();
++            preLoadConfig();
++            finalizeLoadConfig();
 +        }catch (Exception e){
 +            logger.error(e);
 +        }
@@ -259,7 +260,13 @@ index 0000000000000000000000000000000000000000..fcacd381e4a5875ed0c542a9e6c1804f
 +        allInstanced.clear();
 +    }
 +
-+    public static void loadConfig() throws IOException {
++    public static void finalizeLoadConfig() {
++        for (IConfigModule module : allInstanced) {
++            module.onLoaded(configFileInstance);
++        }
++    }
++
++    public static void preLoadConfig() throws IOException {
 +        baseConfigFolder.mkdirs();
 +
 +        if (!baseConfigFile.exists()){
@@ -334,8 +341,6 @@ index 0000000000000000000000000000000000000000..fcacd381e4a5875ed0c542a9e6c1804f
 +                field.set(null,actuallyValue);
 +            }
 +        }
-+
-+        singleConfigModule.onLoaded(configFileInstance);
 +    }
 +
 +    public static @NotNull Set<Class<?>> getClasses(String pack) {
@@ -576,15 +581,27 @@ index 0000000000000000000000000000000000000000..de94c8e39f0ae0da80d5a79af63413e2
 +    // Paper end - lifecycle events
 +}
 \ No newline at end of file
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index 300a044bb0f0e377133f24469cea1a9669de6e58..b30690eba7f06e5af06fb3019e89c067629b77a6 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -123,6 +123,7 @@ public class Main {
+             }
+ 
+             io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
++            me.earthme.luminol.config.LuminolConfig.preLoadConfig(); //Luminol - load config file
+             Bootstrap.bootStrap();
+             Bootstrap.validate();
+             Util.startTimerHackThread();
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 78f33298e809a7f6d079d9f2c64e2caa47a1b25a..e3c8deea68ef49bcd07359e243a12afb57cbcf52 100644
+index 78f33298e809a7f6d079d9f2c64e2caa47a1b25a..426efbc58deb56e044a6b51021ea63cd8f120a14 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -223,6 +223,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
          this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
          // Paper end - initialize global and world-defaults configuration
-+        me.earthme.luminol.config.LuminolConfig.loadConfig(); //Luminol - load config file
++        me.earthme.luminol.config.LuminolConfig.finalizeLoadConfig(); //Luminol - load config file
 +        me.earthme.luminol.config.LuminolConfig.setupLatch(); //Luminol - load config file
          this.server.spark.enableEarlyIfRequested(); // Paper - spark
          // Paper start - fix converting txt to json file; convert old users earlier after PlayerList creation but before file load/save
