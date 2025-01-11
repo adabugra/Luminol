@@ -19,18 +19,20 @@ index fbf51f738e98ac6e8358a7fa81b7fc545469a5a6..6e1a9ee0ebea5c313d568ac276db1f38
            which has been removed by Mojang. Without it, log4j has to classload
 diff --git a/src/main/java/me/earthme/luminol/config/modules/misc/SecureSeedConfig.java b/src/main/java/me/earthme/luminol/config/modules/misc/SecureSeedConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..2eb28e30ae3a80fd9f758127f2d2d5e382fcaba5
+index 0000000000000000000000000000000000000000..ae3014ddee1994c551e206ac9a94b414cf6bc94b
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/config/modules/misc/SecureSeedConfig.java
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,25 @@
 +package me.earthme.luminol.config.modules.misc;
 +
 +import me.earthme.luminol.config.ConfigInfo;
 +import me.earthme.luminol.config.EnumConfigCategory;
++import me.earthme.luminol.config.HotReloadUnsupported;
 +import me.earthme.luminol.config.IConfigModule;
 +
 +public class SecureSeedConfig implements IConfigModule {
 +
++    @HotReloadUnsupported
 +    @ConfigInfo(baseName = "enabled", comments =
 +            "Once you enable secure seed, all ores and structures are generated with 1024-bit seed\n" +
 +                    " instead of using 64-bit seed in vanilla, made seed cracker become impossible.")
