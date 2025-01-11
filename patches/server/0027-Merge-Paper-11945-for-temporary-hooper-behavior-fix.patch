@@ -6,16 +6,17 @@ Subject: [PATCH] Merge Paper #11945 for temporary hooper behavior fix
 A hopper optimization fix on Paper's pr : https://github.com/PaperMC/Paper/pull/11945
 
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 44aae845da6cd34fc00e0c71795d6f610679bd4b..f0c2dae36d944f769082904301bcba91f2d0895f 100644
+index 44aae845da6cd34fc00e0c71795d6f610679bd4b..df56451927d049c1baa5cd43ed0c25a3837474ec 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -764,8 +764,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -764,8 +764,8 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
              } else if (HopperBlockEntity.canMergeItems(itemstack1, stack)) {
                  int j = Math.min(stack.getMaxStackSize(), to.getMaxStackSize()) - itemstack1.getCount(); // Paper - Make hoppers respect inventory max stack size
                  int k = Math.min(stack.getCount(), j);
 -
 -                stack.shrink(k);
-+                stack.copy(true).shrink(k);  // Paper - Perf: Optimize Hoppers
++                stack = stack.copy(true);  // Paper - Perf: Optimize Hoppers
++                stack.shrink(k);  // Paper - Perf: Optimize Hoppers
                  itemstack1.grow(k);
                  flag = k > 0;
              }
