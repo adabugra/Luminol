@@ -1,6 +1,15 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrHua269 <wangxyper@163.com>
+Date: Sun, 12 Jan 2025 15:22:25 +0800
+Subject: [PATCH] Pufferfish SIMD Utilities
+
+
+diff --git a/src/main/java/me/earthme/luminol/config/modules/optimizations/SIMDConfig.java b/src/main/java/me/earthme/luminol/config/modules/optimizations/SIMDConfig.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..76cea165bcef0794a66ef7c29721f7716869420f
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/config/modules/optimizations/SIMDConfig.java
-@@ -1,0 +_,53 @@
+@@ -0,0 +1,53 @@
 +package me.earthme.luminol.config.modules.optimizations;
 +
 +import com.electronwill.nightconfig.core.file.CommentedFileConfig;
