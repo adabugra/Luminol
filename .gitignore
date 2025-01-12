@@ -1,59 +1,16 @@
-# JVM crash related
-core.*
-hs_err_pid*
+# Ignore Gradle project-specific cache directory
+.gradle
 
-# Intellij
+# Ignore Gradle build output directory
+build
+
+/run
+
+/folia-server/build.gradle.kts
+/folia-server/src/minecraft
+/paper-server
+/folia-api/build.gradle.kts
+/paper-api
+/paper-api-generator
+
 .idea/
-*.iml
-*.ipr
-*.iws
-out/
-
-# Eclipse
-.classpath
-.project
-.settings/
-
-# netbeans
-nbproject/
-nbactions.xml
-
-# Gradle
-!gradle-wrapper.jar
-.gradle/
-build/
-*/build/
-
-# we use maven!
-build.xml
-
-# Maven
-log/
-target/
-dependency-reduced-pom.xml
-
-# various other potential build files
-bin/
-dist/
-manifest.mf
-
-# Mac
-.DS_Store/
-.DS_Store
-
-# vim
-.*.sw[a-p]
-
-# Linux temp files
-*~
-
-# other stuff
-run/
-
-# Luminol
-build-data/
-Luminol-API
-Luminol-Server
-paper-api-generator
-*.jar
-/patches2/todo/

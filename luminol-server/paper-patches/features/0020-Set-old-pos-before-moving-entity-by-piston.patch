@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrHua269 <wangxyper@163.com>
+Date: Sun, 12 Jan 2025 11:02:07 +0800
+Subject: [PATCH] Set old pos before moving entity by piston
+
+
+diff --git a/src/main/java/me/earthme/luminol/config/modules/fixes/FoliaPistonIssueFixConfig.java b/src/main/java/me/earthme/luminol/config/modules/fixes/FoliaPistonIssueFixConfig.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..6edfb1d36a88d319151d28ba14873269736f84b6
+--- /dev/null
++++ b/src/main/java/me/earthme/luminol/config/modules/fixes/FoliaPistonIssueFixConfig.java
+@@ -0,0 +1,20 @@
++package me.earthme.luminol.config.modules.fixes;
++
++import me.earthme.luminol.config.ConfigInfo;
++import me.earthme.luminol.config.EnumConfigCategory;
++import me.earthme.luminol.config.IConfigModule;
++
++public class FoliaPistonIssueFixConfig implements IConfigModule {
++    @ConfigInfo(baseName = "enabled")
++    public static boolean enabled = false;
++
++    @Override
++    public EnumConfigCategory getCategory() {
++        return EnumConfigCategory.FIXES;
++    }
++
++    @Override
++    public String getBaseName() {
++        return "folia.fix_piston_moving_issue";
++    }
++}

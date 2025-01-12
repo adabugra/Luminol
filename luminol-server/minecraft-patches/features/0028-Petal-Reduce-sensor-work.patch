@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrHua269 <wangxyper@163.com>
+Date: Sun, 12 Jan 2025 12:21:59 +0800
+Subject: [PATCH] Petal Reduce sensor work
+
+
+diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
+index af7dbb0f2df0ec42c2c16bc58ba16b6c65d3ebcb..53e78475e721a05e9757235d0849eae3878007cd 100644
+--- a/net/minecraft/world/entity/Mob.java
++++ b/net/minecraft/world/entity/Mob.java
+@@ -866,11 +866,11 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+             return;
+         }
+         // Paper end - Allow nerfed mobs to jump and float
++        int i = this.tickCount + this.getId(); //Luminol - Petal - Move up
+         ProfilerFiller profilerFiller = Profiler.get();
+         profilerFiller.push("sensing");
+-        this.sensing.tick();
++        if (i % me.earthme.luminol.config.modules.optimizations.PetalReduceSensorWorkConfig.delayTicks == 0 || !me.earthme.luminol.config.modules.optimizations.PetalReduceSensorWorkConfig.enabled) this.sensing.tick(); // Luminol - Petal - Reduce sensor work
+         profilerFiller.pop();
+-        int i = this.tickCount + this.getId();
+         if (i % 2 != 0 && this.tickCount > 1) {
+             profilerFiller.push("targetSelector");
+             this.targetSelector.tickRunningGoals(false);

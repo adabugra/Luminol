@@ -165,6 +165,13 @@ abstract class MockitoAgentProvider : CommandLineArgumentProvider {
 
 dependencies {
     implementation(project(":luminol-api")) // Luminol
+    implementation("com.electronwill.night-config:toml:3.6.6") // Luminol - Night config
+    // Abomination start
+    implementation("com.github.luben:zstd-jni:1.5.4-1")
+    implementation("org.lz4:lz4-java:1.8.0")
+    implementation("net.openhft:zero-allocation-hashing:0.16")
+    // Abomination end
+    implementation("io.github.classgraph:classgraph:4.8.158") // Kaiiju - Entity throttling & Removal
     implementation("ca.spottedleaf:concurrentutil:0.0.3")
     implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
     implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21

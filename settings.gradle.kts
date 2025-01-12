@@ -1,15 +1,16 @@
-import java.util.Locale
-
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        mavenLocal()
         maven("https://repo.papermc.io/repository/maven-public/")
     }
 }
 
-rootProject.name = "luminol"
-for (name in listOf("Luminol-API", "Luminol-Server")) {
-    val projName = name.lowercase(Locale.ENGLISH)
-    include(projName)
-    findProject(":$projName")!!.projectDir = file(name)
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.9.0"
 }
+
+rootProject.name = "luminol"
+
+include("luminol-api")
+include("luminol-server")

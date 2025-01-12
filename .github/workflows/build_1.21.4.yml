@@ -27,7 +27,7 @@ jobs:
       - name: Configure Git User Details
         run: git config --global user.email "ci@luminolmc.com" && git config --global user.name "LuminolMC CI"
       - name: Apply Patches
-        run: ./gradlew applyPatches
+        run: ./gradlew applyAllPatches
       - name: CreateJar
         run: ./gradlew createMojmapPaperclipJar
       - name: Publish to repo
