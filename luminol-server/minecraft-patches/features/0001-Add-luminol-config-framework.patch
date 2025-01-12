@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
 Date: Sun, 12 Jan 2025 10:15:52 +0800
-Subject: [PATCH] Added luminol config framework
+Subject: [PATCH] Add luminol config framework
 
 
 diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
