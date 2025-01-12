@@ -137,10 +137,14 @@ sourceSets {
     main {
         java { srcDir("../paper-server/src/main/java") }
         resources { srcDir("../paper-server/src/main/resources") }
+        java { srcDir("../folia-server/src/main/java") }
+        resources { srcDir("../folia-server/src/main/resources") }
     }
     test {
         java { srcDir("../paper-server/src/test/java") }
         resources { srcDir("../paper-server/src/test/resources") }
+        java { srcDir("../folia-server/src/test/java") }
+        resources { srcDir("../folia-server/src/test/resources") }
     }
 }
 
