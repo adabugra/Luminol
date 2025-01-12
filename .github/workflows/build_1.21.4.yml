@@ -1,10 +1,10 @@
-name: Luminol CI - ver/1.21.4
+name: Luminol CI - dev/1.21.4-hardfork
 
 on:
     push:
-      branches: [ "ver/1.21.4" ]
+      branches: [ "dev/1.21.4-hardfork" ]
     pull_request:
-      branches: [ "ver/1.21.4" ]
+      branches: [ "dev/1.21.4-hardfork" ]
 
 permissions: write-all
 
