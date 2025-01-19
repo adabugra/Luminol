@@ -1,19 +1,21 @@
 --- a/folia-server/build.gradle.kts
 +++ b/folia-server/build.gradle.kts
-@@ -22,6 +_,7 @@
+@@ -20,8 +_,9 @@
+     minecraftVersion = providers.gradleProperty("mcVersion")
+     // macheOldPath = file("F:\\Projects\\PaperTooling\\mache\\versions\\1.21.4\\src\\main\\java")
      // gitFilePatches = true
-     
+-    
++
      val fork = forks.register("folia") {
 +        rootDirectory = upstreamsDirectory().map { it.dir("folia") }
          upstream.patchDir("paperServer") {
              upstreamPath = "paper-server"
              excludes = setOf("src/minecraft", "patches", "build.gradle.kts")
-@@ -30,8 +_,24 @@
+@@ -30,7 +_,23 @@
          }
      }
  
 -    activeFork = fork
--    
 +    val luminol = forks.register("luminol") {
 +        forks = fork
 +        upstream.patchRepo("paperServer") {
@@ -31,11 +33,10 @@
 +    }
 +
 +    activeFork = luminol
-+
-     paper {
-         paperServerDir = upstreamsDirectory().map { it.dir("paper/paper-server") }
-     }
-@@ -120,10 +_,14 @@
+ 
+     spigot {
+         buildDataRef = "3edaf46ec1eed4115ce1b18d2846cded42577e42"
+@@ -116,10 +_,14 @@
      main {
          java { srcDir("../paper-server/src/main/java") }
          resources { srcDir("../paper-server/src/main/resources") }
@@ -50,7 +51,7 @@
      }
  }
  
-@@ -147,7 +_,14 @@
+@@ -143,7 +_,14 @@
  }
  
  dependencies {
@@ -66,11 +67,10 @@
      implementation("ca.spottedleaf:concurrentutil:0.0.3")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
-@@ -204,6 +_,14 @@
+@@ -200,6 +_,13 @@
      implementation("me.lucko:spark-paper:1.10.119-SNAPSHOT")
  }
  
-+
 +// Pufferfish Start
 +tasks.withType<JavaCompile> {
 +    val compilerArgs = options.compilerArgs
@@ -81,31 +81,30 @@
  tasks.jar {
      manifest {
          val git = Git(rootProject.layout.projectDirectory.path)
-@@ -216,14 +_,14 @@
+@@ -212,14 +_,14 @@
          val gitBranch = git.exec(providers, "rev-parse", "--abbrev-ref", "HEAD").get().trim()
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
 -            "Implementation-Title" to "Folia",
-+            "Implementation-Title" to "Luminol", // Luminol
++            "Implementation-Title" to "Luminol",
              "Implementation-Version" to implementationVersion,
              "Implementation-Vendor" to date,
 -            "Specification-Title" to "Folia",
-+            "Specification-Title" to "Luminol", // Luminol
++            "Specification-Title" to "Luminol",
              "Specification-Version" to project.version,
 -            "Specification-Vendor" to "Paper Team",
 -            "Brand-Id" to "papermc:folia",
 -            "Brand-Name" to "Folia",
-+            "Specification-Vendor" to "Luminol Team", // Luminol
-+            "Brand-Id" to "luminolmc:luminol", // Luminol
-+            "Brand-Name" to "Luminol", // Luminol
++            "Specification-Vendor" to "Luminol Team",
++            "Brand-Id" to "luminolmc:luminol",
++            "Brand-Name" to "Luminol",
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,
-@@ -354,3 +_,10 @@
+@@ -350,3 +_,9 @@
      classpath(tasks.createReobfPaperclipJar.flatMap { it.outputZip })
      mainClass.set(null as String?)
  }
-+
 +// Pufferfish Start
 +tasks.withType<JavaCompile> {
 +    val compilerArgs = options.compilerArgs
