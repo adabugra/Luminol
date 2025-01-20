@@ -27,22 +27,6 @@ index 3614551856c594f3c0cfee984fcf03fad672b007..d97aa31ddffc19f7ca2cd556d5ec3373
                  DebugPackets.sendPoiTicketCountPacket(level, blockPos);
              }
          });
-diff --git a/net/minecraft/world/entity/ai/behavior/YieldJobSite.java b/net/minecraft/world/entity/ai/behavior/YieldJobSite.java
-index 37ad79e201e36a1a9520219e3faa4dcffa7b4dfd..d301614a254ea7a453a226272ab1c3aa0117fbfa 100644
---- a/net/minecraft/world/entity/ai/behavior/YieldJobSite.java
-+++ b/net/minecraft/world/entity/ai/behavior/YieldJobSite.java
-@@ -33,7 +33,10 @@ public class YieldJobSite {
-                         } else if (villager.getVillagerData().getProfession() != VillagerProfession.NONE) {
-                             return false;
-                         } else {
--                            BlockPos blockPos = instance.<GlobalPos>get(potentialJobSite).pos();
-+                            final GlobalPos globalPos = instance.<GlobalPos>get(potentialJobSite); //Luminol - Try fixing off main POI accessing
-+                            final net.minecraft.server.level.ServerLevel targetLevel = net.minecraft.server.MinecraftServer.getServer().getLevel(globalPos.dimension()); //Luminol - Try fixing off main POI accessing
-+                            BlockPos blockPos = globalPos.pos(); //Luminol - Try fixing off main POI accessing
-+                            if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(targetLevel, blockPos) && me.earthme.luminol.config.modules.fixes.FoliaPOIAccessOffRegionFixConfig.enabled) return true; //Luminol - Try fixing off main POI accessing
-                             Optional<Holder<PoiType>> type = level.getPoiManager().getType(blockPos);
-                             if (type.isEmpty()) {
-                                 return true;
 diff --git a/net/minecraft/world/entity/ai/village/poi/PoiManager.java b/net/minecraft/world/entity/ai/village/poi/PoiManager.java
 index c10810bf00d75f459c3c6a9415c1e09f0519d50e..3adafa43367cd6648ecbccb92ba5bd509740d5a4 100644
 --- a/net/minecraft/world/entity/ai/village/poi/PoiManager.java

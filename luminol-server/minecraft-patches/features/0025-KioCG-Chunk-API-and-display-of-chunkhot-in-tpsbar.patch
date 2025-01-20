@@ -66,7 +66,7 @@ index ff71466ec0848d16121e351e30c31bb419af8b99..330af9f4de1c72387326816065350e71
              this.lastServerStatus = nanos;
              this.status = this.buildServerStatus();
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 4c7b0582c7989138ada14e31dc76b8310c7c6f40..0eece9a417aa28de36be2c932eed7434bbb8b961 100644
+index ad121d609bcc1d9b53a1a20d4e25cf9dfa480fb8..887a12b0b33a24f77e3dc118688f9e5b14d6f62f 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -1347,6 +1347,8 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -252,10 +252,10 @@ index eaa77200d6bc33faeefdc2d07b73ee7ddcd3afe8..5ff6973a033033ce1562762bb6f57268
          // CraftBukkit start
          return this.startSleepInBed(bedPos, false);
 diff --git a/net/minecraft/world/entity/projectile/Projectile.java b/net/minecraft/world/entity/projectile/Projectile.java
-index 20f8aed59ac953cac3029115f35e496f9784bec4..d54d96c354cd12e8300c7ddb65d92cd202d5ae48 100644
+index abfe6765faec49d4b8897608582d738c7b09522d..6e1de9252ac1236e0c5196e2511c72c0d7eb3502 100644
 --- a/net/minecraft/world/entity/projectile/Projectile.java
 +++ b/net/minecraft/world/entity/projectile/Projectile.java
-@@ -513,4 +513,11 @@ public abstract class Projectile extends Entity implements TraceableEntity {
+@@ -516,4 +516,11 @@ public abstract class Projectile extends Entity implements TraceableEntity {
      public interface ProjectileFactory<T extends Projectile> {
          T create(ServerLevel level, LivingEntity owner, ItemStack spawnedFrom);
      }
