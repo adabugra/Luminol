@@ -291,10 +291,10 @@ index 0000000000000000000000000000000000000000..3535cf03e7855b4d8b312ccf3a7b0564
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 3a243a0c33fe402d0337541a7ca7d0f6c53efe76..39ac96a61e48750a420ea612e37e3f8195569f10 100644
+index 0b2c520dd035150186487adbabaffede59ca2f6b..8bc4fab8728860278e4d49a7830f41ef31b7ba15 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2399,6 +2399,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2400,6 +2400,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
              //Luminol start - Tpsbar
              getHandle().isTpsBarVisible = data.getBoolean("tpsbarVisible");
              //Luminol end
@@ -304,7 +304,7 @@ index 3a243a0c33fe402d0337541a7ca7d0f6c53efe76..39ac96a61e48750a420ea612e37e3f81
          }
      }
  
-@@ -2423,6 +2426,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2424,6 +2427,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          //Luminol start - Tpsbar
          data.putBoolean("tpsbarVisible",handle.isTpsBarVisible);
          //Luminol end
