@@ -5,10 +5,10 @@ Subject: [PATCH] FoliaPR Add TPS From Region
 
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 9eecd3a68a36d06c66d5f2cdc98c048fe8737337..f139bcd2d64f9ecc6db4c21170d42011642190f7 100644
+index 9196b1e62b328b1e9790b966600aba9681dd0ddc..c4ebe5b9c27277dcc984aa582af2a5e5e12ca936 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -2426,6 +2426,28 @@ public final class Bukkit {
+@@ -2441,6 +2441,28 @@ public final class Bukkit {
      }
      // Paper end
  
@@ -38,10 +38,10 @@ index 9eecd3a68a36d06c66d5f2cdc98c048fe8737337..f139bcd2d64f9ecc6db4c21170d42011
       * Get the advancement specified by this key.
       *
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 041ebeb28378c2f81ccbc586fea9583e059cfbd7..482c8b456a16f53310ee45a6ec5746e0241fab41 100644
+index 11923ef0ea75f702273ba5481ac6d46cc0f17697..6bba6c555e8873057693f60ac1a4b6281b299258 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -2110,6 +2110,24 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -2123,6 +2123,24 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
      double getAverageTickTime();
      // Paper end
  
