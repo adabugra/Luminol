@@ -5,7 +5,7 @@ Subject: [PATCH] Try fixing folia off region POI accessing issue
 
 
 diff --git a/net/minecraft/world/entity/ai/behavior/GoToPotentialJobSite.java b/net/minecraft/world/entity/ai/behavior/GoToPotentialJobSite.java
-index 3614551856c594f3c0cfee984fcf03fad672b007..d97aa31ddffc19f7ca2cd556d5ec3373a17055cf 100644
+index 3614551856c594f3c0cfee984fcf03fad672b007..e318589cbc02b2bd583b03e0be927aa7c8033c29 100644
 --- a/net/minecraft/world/entity/ai/behavior/GoToPotentialJobSite.java
 +++ b/net/minecraft/world/entity/ai/behavior/GoToPotentialJobSite.java
 @@ -47,10 +47,17 @@ public class GoToPotentialJobSite extends Behavior<Villager> {
@@ -20,7 +20,7 @@ index 3614551856c594f3c0cfee984fcf03fad672b007..d97aa31ddffc19f7ca2cd556d5ec3373
 -
 +                };
 +                if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(level1, blockPos) && me.earthme.luminol.config.modules.fixes.FoliaPOIAccessOffRegionFixConfig.enabled)
-+                    io.papermc.paper.threadedregions.RegionizedServer.getInstance().taskQueue.queueTickTaskQueue(level, blockPos.getX() >> 4, blockPos.getZ() >> 4, scheduledRelease);
++                    io.papermc.paper.threadedregions.RegionizedServer.getInstance().taskQueue.queueTickTaskQueue(level1, blockPos.getX() >> 4, blockPos.getZ() >> 4, scheduledRelease);
 +                else
 +                    scheduledRelease.run();
 +                //Luminol end
