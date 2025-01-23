@@ -6,6 +6,8 @@ build
 
 /run
 
+/luminol-server/build.gradle.kts
+/luminol-api/build.gradle.kts
 /folia-server/build.gradle.kts
 /folia-server/src/minecraft
 /paper-server
