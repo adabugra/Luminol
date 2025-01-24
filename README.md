@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("me.earthme.luminol:luminol-api:1.21.3-R0.1-20241201.004037-1")
+    compileOnly("me.earthme.luminol:luminol-api:1.21.4-R0.1-20250111.144052-34")
 }
  ```
 
@@ -56,7 +56,7 @@ dependencies {
     <dependency>
         <groupId>me.earthme.luminol</groupId>
         <artifactId>luminol-api</artifactId>
-        <version>1.21.3-R0.1-20241201.004037-1</version>
+        <version>1.21.4-R0.1-20250111.144052-34</version>
     </dependency>
 </dependencies>
 ```
