@@ -4,29 +4,6 @@ Date: Sun, 12 Jan 2025 10:56:59 +0800
 Subject: [PATCH] Try fixing folia off region POI accessing issue
 
 
-diff --git a/net/minecraft/world/entity/ai/behavior/GoToPotentialJobSite.java b/net/minecraft/world/entity/ai/behavior/GoToPotentialJobSite.java
-index 3614551856c594f3c0cfee984fcf03fad672b007..e318589cbc02b2bd583b03e0be927aa7c8033c29 100644
---- a/net/minecraft/world/entity/ai/behavior/GoToPotentialJobSite.java
-+++ b/net/minecraft/world/entity/ai/behavior/GoToPotentialJobSite.java
-@@ -47,10 +47,17 @@ public class GoToPotentialJobSite extends Behavior<Villager> {
-             ServerLevel level1 = level.getServer().getLevel(globalPos.dimension());
-             if (level1 != null) {
-                 PoiManager poiManager = level1.getPoiManager();
-+                //Luminol start - Fix off region POI accessing
-+                java.lang.Runnable scheduledRelease = () -> {
-                 if (poiManager.exists(blockPos, holder -> true)) {
-                     poiManager.release(blockPos);
-                 }
--
-+                };
-+                if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(level1, blockPos) && me.earthme.luminol.config.modules.fixes.FoliaPOIAccessOffRegionFixConfig.enabled)
-+                    io.papermc.paper.threadedregions.RegionizedServer.getInstance().taskQueue.queueTickTaskQueue(level1, blockPos.getX() >> 4, blockPos.getZ() >> 4, scheduledRelease);
-+                else
-+                    scheduledRelease.run();
-+                //Luminol end
-                 DebugPackets.sendPoiTicketCountPacket(level, blockPos);
-             }
-         });
 diff --git a/net/minecraft/world/entity/ai/village/poi/PoiManager.java b/net/minecraft/world/entity/ai/village/poi/PoiManager.java
 index c10810bf00d75f459c3c6a9415c1e09f0519d50e..3adafa43367cd6648ecbccb92ba5bd509740d5a4 100644
 --- a/net/minecraft/world/entity/ai/village/poi/PoiManager.java
