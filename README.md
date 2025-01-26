@@ -76,6 +76,11 @@ dependencies {
 ## BStats
 ![bStats](https://bstats.org/signatures/server-implementation/Luminol.svg "bStats")
 
+## 特别感谢
+<b>感谢[LegacyLands](https://github.com/LegacyLands)对本项目的赞助,如果你想开发一些跨folia/非folia平台的插件,[legacy-lands-library](https://github.com/LegacyLands/legacy-lands-library/)将会是个不错的lib</b>
+
+![legacy-lands-logo](public/image/legacy-lands-logo.png)
+
 ## 请给我们一个 ⭐Star！
 > 你的每一个免费的 ⭐Star 就是我们每一个前进的动力。
 

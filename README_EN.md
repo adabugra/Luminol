@@ -76,6 +76,11 @@ See [Contributing](./docs/CONTRIBUTING_EN.md)
 ## BStats
 ![bStats](https://bstats.org/signatures/server-implementation/Luminol.svg "bStats")
 
+## Special Thanks
+Thanks [LegacyLands](https://github.com/LegacyLands) for sponsoring this project.If you want to develop some crossing folia/non-folia platform plugins, [legacy-lands-library](https://github.com/LegacyLands/legacy-lands-library/) will be a nice choice for you
+
+![legacy-lands-logo](public/image/legacy-lands-logo.png)
+
 ## Please ⭐star us!
 <a href="https://star-history.com/#LuminolMC/Luminol&LuminolMC/LightingLuminol&Date">
   <picture>
