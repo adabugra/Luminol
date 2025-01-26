@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrHua269 <wangxyper@163.com>
+Date: Sun, 26 Jan 2025 23:11:33 +0800
+Subject: [PATCH] Fix incorrect ifn check on folia's tracker process
+
+
+diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
+index 4bdb05948e9102304364f3681ce353f1cf2a0aee..5c507be097051de9a43a31bbc6190c3db7688667 100644
+--- a/net/minecraft/server/level/ChunkMap.java
++++ b/net/minecraft/server/level/ChunkMap.java
+@@ -902,7 +902,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+                         // Folia start - region threading
+                         for (Entity possible : this.level.getCurrentWorldData().trackerEntities) {
+                             ChunkMap.TrackedEntity trackedEntity1 = possible.moonrise$getTrackedEntity();
+-                            if (trackedEntity == null) {
++                            if (trackedEntity1 == null) {
+                                 continue;
+                             }
+                             // Folia end - region threading
