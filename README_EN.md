@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("me.earthme.luminol:luminol-api:1.21.4-R0.1-20250111.144052-34")
+    compileOnly("me.earthme.luminol:luminol-api:$VERSION")
 }
  ```
 
@@ -57,7 +57,7 @@ For maven
 <dependency>
     <groupId>me.earthme.luminol</groupId>
     <artifactId>luminol-api</artifactId>
-    <version>1.21.4-R0.1-20250111.144052-34</version>
+    <version>$VERSION</version>
 </dependency>
 </dependencies>
 ```
