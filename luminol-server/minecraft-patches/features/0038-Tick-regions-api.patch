@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrHua269 <wangxyper@163.com>
+Date: Mon, 27 Jan 2025 13:01:55 +0800
+Subject: [PATCH] Tick regions api
+
+
+diff --git a/io/papermc/paper/threadedregions/ThreadedRegionizer.java b/io/papermc/paper/threadedregions/ThreadedRegionizer.java
+index 604385af903845d966382ad0a4168798e4ed4a0e..7ac803ba9706b65a0125b6e00983fe6a7947991a 100644
+--- a/io/papermc/paper/threadedregions/ThreadedRegionizer.java
++++ b/io/papermc/paper/threadedregions/ThreadedRegionizer.java
+@@ -819,7 +819,7 @@ public final class ThreadedRegionizer<R extends ThreadedRegionizer.ThreadedRegio
+             return this.deadSections.size() == this.sectionByKey.size();
+         }
+ 
+-        private final double getDeadSectionPercent() {
++        public final double getDeadSectionPercent() { // Luminol - Threaded regions api
+             return (double)this.deadSections.size() / (double)this.sectionByKey.size();
+         }
+ 
