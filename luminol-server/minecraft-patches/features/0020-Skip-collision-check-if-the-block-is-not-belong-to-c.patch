@@ -6,16 +6,18 @@ Subject: [PATCH] Skip collision check if the block is not belong to current
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index c87db2d497ca9ed2e8aad5f1bc52555ff0952b80..759db5813cc83daa6f0e397483fdb8bd90950a72 100644
+index c87db2d497ca9ed2e8aad5f1bc52555ff0952b80..a5c032f2e89681008c4fac6930b90d9a6c4f5531 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -1675,6 +1675,10 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1675,6 +1675,12 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                          return;
                      }
  
++                    // Luminol start - Try fixing folia's old position issue
 +                    if(!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(this.level, blockPos) && me.earthme.luminol.config.modules.fixes.FoliaOldPositionIssueFixConfig.enabled) {
 +                        continue;
 +                    }
++                    // Luminol end
 +
                      BlockState blockState = this.level().getBlockState(blockPos);
                      if (!blockState.isAir() && set.add(blockPos.asLong())) {
