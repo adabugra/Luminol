@@ -18,10 +18,10 @@ index ba8b5a0ebe652bfaf5c1498c19d12a91a192bf8e..76e0b50b2dc9c718a67f89de720a891b
              }
              if (entity instanceof final Mob mob && mob.getTarget() != null) {
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index 5ba06cf6b26baa5acae9d64111ee3f61533e7867..d7eb8022a1606760d8e81bc752241eff4496ef4c 100644
+index d50aef6307fb854c8d4f66bb622cdafc43dce0ae..b6c820ebdc42edc1f3ce5c18eee5bff2e3822437 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -2039,6 +2039,20 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -2044,6 +2044,20 @@ public abstract class LivingEntity extends Entity implements Attackable {
          return this.lastClimbablePos;
      }
  

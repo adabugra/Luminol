@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
-Date: Sun, 12 Jan 2025 11:29:51 +0800
+Date: Wed, 29 Jan 2025 09:12:07 +0800
 Subject: [PATCH] KioCG Chunk API and display of chunkhot in tpsbar
 
 
@@ -184,13 +184,13 @@ index de8b9048c8395c05b8688bc9d984b8ad680f15b3..f42692cd4f0154705c3d5b030d281cfc
 +    // KioCG end
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 34b87dfa8a7d9cbdf04bfada87515e0eb418fe2b..d5249c32d397aa5faa31fab6a28edea2da9c57c9 100644
+index 7a112a3a0a9411a166666c657dac6b7888105545..8e9190da44839ba62880cf3218b5d5aaf300e34f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3569,4 +3569,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
-         this.getHandle().connection.send(new net.minecraft.network.protocol.game.ClientboundEntityEventPacket(((CraftEntity) target).getHandle(), effect.getData()));
+@@ -3605,4 +3605,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         handle.containerMenu.broadcastChanges();
+         return new PaperPlayerGiveResult(leftovers.build(), drops.build());
      }
-     // Paper end - entity effect API
 +
 +    // KioCG start - ChunkHot
 +    @Override

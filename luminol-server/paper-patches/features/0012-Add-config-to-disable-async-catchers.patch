@@ -1,20 +1,20 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrHua269 <wangxyper@163.com>
-Date: Sun, 12 Jan 2025 10:35:49 +0800
+Date: Wed, 29 Jan 2025 09:08:22 +0800
 Subject: [PATCH] Add config to disable async catchers
 
 
 diff --git a/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java b/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java
-index 5aa2891d52fb246329bf3483059b069b86fd621a..0724ec897a4ac70469f2c9cd740ea41cb71971a1 100644
+index c95769a4e64fabd7acdff6c5f6f349107e1cf5c0..4efa1c057ae6cfdea7889c372bd62dc14637daa0 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java
 +++ b/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java
-@@ -26,14 +26,14 @@ public class TickThread extends Thread {
+@@ -48,14 +48,14 @@ public class TickThread extends Thread {
       */
      @Deprecated
      public static void ensureTickThread(final String reason) {
 -        if (!isTickThread()) {
 +        if (!isTickThread() && !me.earthme.luminol.config.modules.experiment.DisableAsyncCatcherConfig.enabled) { // Luminol
-             LOGGER.error("Thread " + Thread.currentThread().getName() + " failed main thread check: " + reason, new Throwable());
+             LOGGER.error("Thread failed main thread check: " + reason + ", context=" + getThreadContext(), new Throwable());
              throw new IllegalStateException(reason);
          }
      }
@@ -22,53 +22,62 @@ index 5aa2891d52fb246329bf3483059b069b86fd621a..0724ec897a4ac70469f2c9cd740ea41c
      public static void ensureTickThread(final Level world, final BlockPos pos, final String reason) {
 -        if (!isTickThreadFor(world, pos)) {
 +        if (!isTickThreadFor(world, pos) && !me.earthme.luminol.config.modules.experiment.DisableAsyncCatcherConfig.enabled) { // Luminol
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
-                                reason + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + pos;
+             final String ex = "Thread failed main thread check: " +
+                                reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + pos;
              LOGGER.error(ex, new Throwable());
-@@ -51,7 +51,7 @@ public class TickThread extends Thread {
+@@ -64,7 +64,7 @@ public class TickThread extends Thread {
+     }
+ 
+     public static void ensureTickThread(final Level world, final BlockPos pos, final int blockRadius, final String reason) {
+-        if (!isTickThreadFor(world, pos, blockRadius)) {
++        if (!isTickThreadFor(world, pos, blockRadius) && !me.earthme.luminol.config.modules.experiment.DisableAsyncCatcherConfig.enabled) { // Luminol
+             final String ex = "Thread failed main thread check: " +
+                 reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + pos + ", block_radius=" + blockRadius;
+             LOGGER.error(ex, new Throwable());
+@@ -73,7 +73,7 @@ public class TickThread extends Thread {
      }
  
      public static void ensureTickThread(final Level world, final ChunkPos pos, final String reason) {
 -        if (!isTickThreadFor(world, pos)) {
 +        if (!isTickThreadFor(world, pos) && !me.earthme.luminol.config.modules.experiment.DisableAsyncCatcherConfig.enabled) { // Luminol
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
-                 reason + ", world=" + WorldUtil.getWorldName(world) + ", chunk_pos=" + pos;
+             final String ex = "Thread failed main thread check: " +
+                 reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", chunk_pos=" + pos;
              LOGGER.error(ex, new Throwable());
-@@ -60,7 +60,7 @@ public class TickThread extends Thread {
+@@ -82,7 +82,7 @@ public class TickThread extends Thread {
      }
  
      public static void ensureTickThread(final Level world, final int chunkX, final int chunkZ, final String reason) {
 -        if (!isTickThreadFor(world, chunkX, chunkZ)) {
 +        if (!isTickThreadFor(world, chunkX, chunkZ) && !me.earthme.luminol.config.modules.experiment.DisableAsyncCatcherConfig.enabled) { // Luminol
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
-                 reason + ", world=" + WorldUtil.getWorldName(world) + ", chunk_pos=" + new ChunkPos(chunkX, chunkZ);
+             final String ex = "Thread failed main thread check: " +
+                 reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", chunk_pos=" + new ChunkPos(chunkX, chunkZ);
              LOGGER.error(ex, new Throwable());
-@@ -69,7 +69,7 @@ public class TickThread extends Thread {
+@@ -91,7 +91,7 @@ public class TickThread extends Thread {
      }
  
      public static void ensureTickThread(final Entity entity, final String reason) {
 -        if (!isTickThreadFor(entity)) {
 +        if (!isTickThreadFor(entity) && !me.earthme.luminol.config.modules.experiment.DisableAsyncCatcherConfig.enabled) { // Luminol
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
-                 reason + ", entity=" + entity;
+             final String ex = "Thread failed main thread check: " +
+                 reason + ", context=" + getThreadContext() + ", entity=" + EntityUtil.dumpEntity(entity);
              LOGGER.error(ex, new Throwable());
-@@ -78,7 +78,7 @@ public class TickThread extends Thread {
+@@ -100,7 +100,7 @@ public class TickThread extends Thread {
      }
  
      public static void ensureTickThread(final Level world, final AABB aabb, final String reason) {
 -        if (!isTickThreadFor(world, aabb)) {
 +        if (!isTickThreadFor(world, aabb) && !me.earthme.luminol.config.modules.experiment.DisableAsyncCatcherConfig.enabled) { // Luminol
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
-                 reason + ", world=" + WorldUtil.getWorldName(world) + ", aabb=" + aabb;
+             final String ex = "Thread failed main thread check: " +
+                 reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", aabb=" + aabb;
              LOGGER.error(ex, new Throwable());
-@@ -87,7 +87,7 @@ public class TickThread extends Thread {
+@@ -109,7 +109,7 @@ public class TickThread extends Thread {
      }
  
      public static void ensureTickThread(final Level world, final double blockX, final double blockZ, final String reason) {
 -        if (!isTickThreadFor(world, blockX, blockZ)) {
 +        if (!isTickThreadFor(world, blockX, blockZ) && !me.earthme.luminol.config.modules.experiment.DisableAsyncCatcherConfig.enabled) { // Luminol
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
-                 reason + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + new Vec3(blockX, 0.0, blockZ);
+             final String ex = "Thread failed main thread check: " +
+                 reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + new Vec3(blockX, 0.0, blockZ);
              LOGGER.error(ex, new Throwable());
 diff --git a/src/main/java/me/earthme/luminol/config/modules/experiment/DisableAsyncCatcherConfig.java b/src/main/java/me/earthme/luminol/config/modules/experiment/DisableAsyncCatcherConfig.java
 new file mode 100644
