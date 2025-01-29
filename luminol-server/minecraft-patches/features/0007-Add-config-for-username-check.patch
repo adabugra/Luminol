@@ -19,7 +19,7 @@ index 159f2f169d26b436a70006f7bc9bdc481315dd32..2b366fea4d8d376b150786fdc00fd5e2
              && !this.iKnowThisMayNotBeTheBestIdeaButPleaseDisableUsernameValidation) {
              Validate.validState(StringUtil.isReasonablePlayerName(packet.name()), "Invalid characters in username");
 diff --git a/net/minecraft/server/players/GameProfileCache.java b/net/minecraft/server/players/GameProfileCache.java
-index 6fb3712f33a84a3612752dcfd9e97d67066f610e..26d37cf8fec2e8b0d3c3c1bbe4693d4c6ca4d4f9 100644
+index 6fb3712f33a84a3612752dcfd9e97d67066f610e..1999188b5667035362ba579a80b30336c5c7fc38 100644
 --- a/net/minecraft/server/players/GameProfileCache.java
 +++ b/net/minecraft/server/players/GameProfileCache.java
 @@ -77,7 +77,7 @@ public class GameProfileCache {
@@ -27,7 +27,27 @@ index 6fb3712f33a84a3612752dcfd9e97d67066f610e..26d37cf8fec2e8b0d3c3c1bbe4693d4c
  
      private static Optional<GameProfile> lookupGameProfile(GameProfileRepository profileRepo, String name) {
 -        if (!StringUtil.isValidPlayerName(name)) {
-+        if (!StringUtil.isValidPlayerName(name) && false) { // Luminol - Add config for username check - Directly return, skip unnecessary following logic
++        if (!StringUtil.isValidPlayerName(name, false)) { // Luminol - Add config for username check - Directly return, skip unnecessary following logic
              return createUnknownProfile(name);
          } else {
              final AtomicReference<GameProfile> atomicReference = new AtomicReference<>();
+diff --git a/net/minecraft/util/StringUtil.java b/net/minecraft/util/StringUtil.java
+index 77947e6915facee44588943fcd3e5b513de37e77..d9f95c5cf4bd2946244c153db0fd21c8d51ae20d 100644
+--- a/net/minecraft/util/StringUtil.java
++++ b/net/minecraft/util/StringUtil.java
+@@ -62,8 +62,14 @@ public class StringUtil {
+     public static boolean isAllowedChatCharacter(char character) {
+         return character != 167 && character >= ' ' && character != 127;
+     }
++    // Luminol start - Add config for username checks
++    public static boolean isValidPlayerName(String username){
++        return isValidPlayerName(username, !me.earthme.luminol.config.modules.misc.UsernameCheckConfig.enabled);
++    }
++    // Luminol end
+ 
+-    public static boolean isValidPlayerName(String playerName) {
++    public static boolean isValidPlayerName(String playerName, boolean byPass) { // Luminol - Add config for username checks
++        if (byPass) return playerName.length() <= 16; // Luminol - Add config for username checks
+         return playerName.length() <= 16 && playerName.chars().filter(i -> i <= 32 || i >= 127).findAny().isEmpty();
+     }
+ 
