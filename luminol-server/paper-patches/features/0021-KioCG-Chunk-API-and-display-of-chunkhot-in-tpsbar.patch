@@ -184,10 +184,10 @@ index de8b9048c8395c05b8688bc9d984b8ad680f15b3..f42692cd4f0154705c3d5b030d281cfc
 +    // KioCG end
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 7a112a3a0a9411a166666c657dac6b7888105545..8e9190da44839ba62880cf3218b5d5aaf300e34f 100644
+index 03a9f4d8e83f53326c30f00286efd1ddaaac84d2..84304fc8c26a6e1e3515b131a2ee3357262efcc3 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3605,4 +3605,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3611,4 +3611,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          handle.containerMenu.broadcastChanges();
          return new PaperPlayerGiveResult(leftovers.build(), drops.build());
      }
