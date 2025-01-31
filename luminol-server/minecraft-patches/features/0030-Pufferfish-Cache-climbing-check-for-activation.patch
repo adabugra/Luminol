@@ -5,7 +5,7 @@ Subject: [PATCH] Pufferfish Cache climbing check for activation
 
 
 diff --git a/io/papermc/paper/entity/activation/ActivationRange.java b/io/papermc/paper/entity/activation/ActivationRange.java
-index ba8b5a0ebe652bfaf5c1498c19d12a91a192bf8e..76e0b50b2dc9c718a67f89de720a891b398cec2a 100644
+index 8b661a11ed798186335b4ea6b907eb719cbbf722..956807b34d5fda666966d23d46a7ae4ec5055071 100644
 --- a/io/papermc/paper/entity/activation/ActivationRange.java
 +++ b/io/papermc/paper/entity/activation/ActivationRange.java
 @@ -225,7 +225,7 @@ public final class ActivationRange {

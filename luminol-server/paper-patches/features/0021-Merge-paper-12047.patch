@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrHua269 <wangxyper@163.com>
+Date: Fri, 31 Jan 2025 12:54:46 +0800
+Subject: [PATCH] Merge paper #12047
+
+
+diff --git a/src/main/java/io/papermc/paper/entity/activation/ActivationType.java b/src/main/java/io/papermc/paper/entity/activation/ActivationType.java
+index 01fef8353934f22a5176e731847d3df4a7df5306..f707c982ce1f650eaf8c6501b816bb5717cb0a45 100644
+--- a/src/main/java/io/papermc/paper/entity/activation/ActivationType.java
++++ b/src/main/java/io/papermc/paper/entity/activation/ActivationType.java
+@@ -28,7 +28,7 @@ public enum ActivationType {
+      * @return activation type
+      */
+     public static ActivationType activationTypeFor(final Entity entity) {
+-        if (entity instanceof WaterAnimal) {
++        if (entity instanceof WaterAnimal || entity instanceof net.minecraft.world.entity.animal.AgeableWaterCreature) { // Luminol - Merge paper #12047
+             return ActivationType.WATER;
+         } else if (entity instanceof Villager) {
+             return ActivationType.VILLAGER;
+@@ -44,4 +44,4 @@ public enum ActivationType {
+             return ActivationType.MISC;
+         }
+     }
+-}
++}
+\ No newline at end of file

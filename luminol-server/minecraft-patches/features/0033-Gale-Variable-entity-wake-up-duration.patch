@@ -5,7 +5,7 @@ Subject: [PATCH] Gale Variable entity wake-up duration
 
 
 diff --git a/io/papermc/paper/entity/activation/ActivationRange.java b/io/papermc/paper/entity/activation/ActivationRange.java
-index 76e0b50b2dc9c718a67f89de720a891b398cec2a..e3d2371e36b48bb820931394e5b4182152f57630 100644
+index 956807b34d5fda666966d23d46a7ae4ec5055071..3a1c4f9f44026dcff7f4a32bb3ceaf79963389ed 100644
 --- a/io/papermc/paper/entity/activation/ActivationRange.java
 +++ b/io/papermc/paper/entity/activation/ActivationRange.java
 @@ -54,27 +54,39 @@ public final class ActivationRange {
