@@ -6,10 +6,10 @@ Subject: [PATCH] Add missing teleportation apis for folia
 
 diff --git a/src/main/java/me/earthme/luminol/api/entity/EntityTeleportAsyncEvent.java b/src/main/java/me/earthme/luminol/api/entity/EntityTeleportAsyncEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..0c218c99073e4d20532f81c5ab467fbf3e7a57e8
+index 0000000000000000000000000000000000000000..04e1d7b39e1c140d6c9910c371d2fc65468dfc38
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/api/entity/EntityTeleportAsyncEvent.java
-@@ -0,0 +1,75 @@
+@@ -0,0 +1,80 @@
 +package me.earthme.luminol.api.entity;
 +
 +import org.apache.commons.lang3.Validate;
@@ -84,13 +84,18 @@ index 0000000000000000000000000000000000000000..0c218c99073e4d20532f81c5ab467fbf
 +    public void setCancelled(boolean cancel) {
 +        this.cancelled = cancel;
 +    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
++        return HANDLERS;
++    }
 +}
 diff --git a/src/main/java/me/earthme/luminol/api/entity/PostEntityPortalEvent.java b/src/main/java/me/earthme/luminol/api/entity/PostEntityPortalEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..50b601d124bbaf4eedb626d84ed6dae9ab6e9ef1
+index 0000000000000000000000000000000000000000..dd3087b407ccf4e96448701e6fbf75705498f982
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/api/entity/PostEntityPortalEvent.java
-@@ -0,0 +1,36 @@
+@@ -0,0 +1,41 @@
 +package me.earthme.luminol.api.entity;
 +
 +import org.apache.commons.lang3.Validate;
@@ -126,13 +131,18 @@ index 0000000000000000000000000000000000000000..50b601d124bbaf4eedb626d84ed6dae9
 +    public @NotNull HandlerList getHandlers() {
 +        return HANDLER_LIST;
 +    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
++        return HANDLER_LIST;
++    }
 +}
 diff --git a/src/main/java/me/earthme/luminol/api/entity/PreEntityPortalEvent.java b/src/main/java/me/earthme/luminol/api/entity/PreEntityPortalEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..e25146f3b5d296ecd21e62ed97f574f6a3a4af1d
+index 0000000000000000000000000000000000000000..fc844429e3ecfe2529c0a49b8a5d958eeb188ad9
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/api/entity/PreEntityPortalEvent.java
-@@ -0,0 +1,73 @@
+@@ -0,0 +1,78 @@
 +package me.earthme.luminol.api.entity;
 +
 +import org.apache.commons.lang3.Validate;
@@ -205,13 +215,18 @@ index 0000000000000000000000000000000000000000..e25146f3b5d296ecd21e62ed97f574f6
 +    public @NotNull HandlerList getHandlers() {
 +        return HANDLERS;
 +    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
++        return HANDLERS;
++    }
 +}
 diff --git a/src/main/java/me/earthme/luminol/api/entity/player/PostPlayerRespawnEvent.java b/src/main/java/me/earthme/luminol/api/entity/player/PostPlayerRespawnEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..bf4469593b22f3e5cff89953819e7fdde252abf5
+index 0000000000000000000000000000000000000000..9a561455560dfeee1d8762297ebf15a7c11de4d1
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/api/entity/player/PostPlayerRespawnEvent.java
-@@ -0,0 +1,35 @@
+@@ -0,0 +1,40 @@
 +package me.earthme.luminol.api.entity.player;
 +
 +import org.apache.commons.lang3.Validate;
@@ -246,13 +261,18 @@ index 0000000000000000000000000000000000000000..bf4469593b22f3e5cff89953819e7fdd
 +    public @NotNull HandlerList getHandlers() {
 +        return HANDLERS;
 +    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
++        return HANDLERS;
++    }
 +}
 diff --git a/src/main/java/me/earthme/luminol/api/portal/EndPlatformCreateEvent.java b/src/main/java/me/earthme/luminol/api/portal/EndPlatformCreateEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..12b2bef2f66f22bb56c10434cc08b39cef335447
+index 0000000000000000000000000000000000000000..cf87a7cce5d1ebec9709b762595609344807150b
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/api/portal/EndPlatformCreateEvent.java
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,35 @@
 +package me.earthme.luminol.api.portal;
 +
 +import org.bukkit.event.Cancellable;
@@ -282,13 +302,18 @@ index 0000000000000000000000000000000000000000..12b2bef2f66f22bb56c10434cc08b39c
 +    public @NotNull HandlerList getHandlers() {
 +        return HANDLERS;
 +    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
++        return HANDLERS;
++    }
 +}
 diff --git a/src/main/java/me/earthme/luminol/api/portal/PortalLocateEvent.java b/src/main/java/me/earthme/luminol/api/portal/PortalLocateEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f68bf95bba671f3cf90d9878d93dd319bdf9db40
+index 0000000000000000000000000000000000000000..2b67f99aafda11eebc55386c503e34772de6cd8a
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/api/portal/PortalLocateEvent.java
-@@ -0,0 +1,57 @@
+@@ -0,0 +1,62 @@
 +package me.earthme.luminol.api.portal;
 +
 +import org.apache.commons.lang3.Validate;
@@ -343,6 +368,11 @@ index 0000000000000000000000000000000000000000..f68bf95bba671f3cf90d9878d93dd319
 +
 +    @Override
 +    public @NotNull HandlerList getHandlers() {
++        return HANDLERS;
++    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
 +        return HANDLERS;
 +    }
 +}
