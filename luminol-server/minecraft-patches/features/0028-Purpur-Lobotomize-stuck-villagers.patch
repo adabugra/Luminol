@@ -5,7 +5,7 @@ Subject: [PATCH] Purpur Lobotomize stuck villagers
 
 
 diff --git a/net/minecraft/world/entity/npc/Villager.java b/net/minecraft/world/entity/npc/Villager.java
-index 7ea74aeb905b95e5919d74df5fbc5e8f7a9985e3..d6e337ac8cf3d40f60a20b07826a4eee1c865bc3 100644
+index 7ea74aeb905b95e5919d74df5fbc5e8f7a9985e3..b61da3d0d7d24b674cae155b95f7fab0669f4a20 100644
 --- a/net/minecraft/world/entity/npc/Villager.java
 +++ b/net/minecraft/world/entity/npc/Villager.java
 @@ -193,6 +193,53 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
@@ -62,7 +62,7 @@ index 7ea74aeb905b95e5919d74df5fbc5e8f7a9985e3..d6e337ac8cf3d40f60a20b07826a4eee
      @Override
      public Brain<Villager> getBrain() {
          return (Brain<Villager>)super.getBrain();
-@@ -289,10 +336,18 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -289,11 +336,21 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          // Paper start - EAR 2
          this.customServerAiStep(level, false);
      }
@@ -71,6 +71,7 @@ index 7ea74aeb905b95e5919d74df5fbc5e8f7a9985e3..d6e337ac8cf3d40f60a20b07826a4eee
          // Paper end - EAR 2
          ProfilerFiller profilerFiller = Profiler.get();
          profilerFiller.push("villagerBrain");
+-        if (!inactive) this.getBrain().tick(level, this); // Paper - EAR 2
 +        // Purpur start
 +        if (me.earthme.luminol.config.modules.optimizations.LobotomizeVillageConfig.villagerLobotomizeEnabled) {
 +            // treat as inactive if lobotomized
@@ -79,6 +80,9 @@ index 7ea74aeb905b95e5919d74df5fbc5e8f7a9985e3..d6e337ac8cf3d40f60a20b07826a4eee
 +            this.isLobotomized = false;
 +        }
 +        // Purpur end
-         if (!inactive) this.getBrain().tick(level, this); // Paper - EAR 2
++        if (!inactive) {
++            this.getBrain().tick(level, this); // Paper - EAR 2
++        } else if (this.isLobotomized && shouldRestock()) restock(); // Purpur - Lobotomize stuck villagers
          profilerFiller.pop();
          if (this.assignProfessionWhenSpawned) {
+             this.assignProfessionWhenSpawned = false;
