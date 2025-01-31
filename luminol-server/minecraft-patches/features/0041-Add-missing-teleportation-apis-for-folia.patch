@@ -19,7 +19,7 @@ index 9fd3fe181df2ce6dbe695f6463d3940ac4c01167..822d401150d3764004b2570da828b4f6
              );
          });
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 406c382ae2fdaa7d8996d250487bbdfb7e4bb7f9..29fc2e5af0b6ec81c3f0c1c89f76166e7f4ac19c 100644
+index 406c382ae2fdaa7d8996d250487bbdfb7e4bb7f9..c742695ea24588826f50740ad442f3234953ba81 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -4164,6 +4164,15 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -120,7 +120,7 @@ index 406c382ae2fdaa7d8996d250487bbdfb7e4bb7f9..29fc2e5af0b6ec81c3f0c1c89f76166e
          // Kaiiju start - sync end platform spawning & entity teleportation
          final java.util.function.Consumer<Entity> tpComplete = type == PortalType.END && destination.getTypeKey() == LevelStem.END ?
 -              e -> net.minecraft.world.level.levelgen.feature.EndPlatformFeature.createEndPlatform(destination, ServerLevel.END_SPAWN_POINT.below(), true, null) : teleportComplete;
-+              e -> { if (new me.earthme.luminol.api.portal.EndPlatformCreateEvent().callEvent()) net.minecraft.world.level.levelgen.feature.EndPlatformFeature.createEndPlatform(destination, ServerLevel.END_SPAWN_POINT.below(), true, null); } : teleportComplete; // Luminol - Add missing teleportation events
++              e -> { if (new me.earthme.luminol.api.portal.EndPlatformCreateEvent().callEvent() && ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(e.level, ServerLevel.END_SPAWN_POINT.below())) net.minecraft.world.level.levelgen.feature.EndPlatformFeature.createEndPlatform(destination, ServerLevel.END_SPAWN_POINT.below(), true, null); } : teleportComplete; // Luminol - Add missing teleportation events & Fix teleportation api threading issue
          // Kaiiju end
  
          Vec3 initialPosition = this.position();
