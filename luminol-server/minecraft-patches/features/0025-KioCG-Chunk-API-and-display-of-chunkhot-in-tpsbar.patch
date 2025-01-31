@@ -104,10 +104,10 @@ index ad121d609bcc1d9b53a1a20d4e25cf9dfa480fb8..887a12b0b33a24f77e3dc118688f9e5b
      }
  
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index a07e02132bdda2693686440b9932992641cb6957..cbe7f275e7a466bd7f8ea184b22ced908b5a3d20 100644
+index f1239f1a7b6b8fd958333df8092359eea7197fc0..9fd3fe181df2ce6dbe695f6463d3940ac4c01167 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -1007,7 +1007,34 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1008,7 +1008,34 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
          this.trackEnteredOrExitedLavaOnVehicle();
          this.updatePlayerAttributes();
          this.advancements.flushDirty(this);
