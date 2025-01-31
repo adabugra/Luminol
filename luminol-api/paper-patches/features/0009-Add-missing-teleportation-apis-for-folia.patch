@@ -6,10 +6,10 @@ Subject: [PATCH] Add missing teleportation apis for folia
 
 diff --git a/src/main/java/me/earthme/luminol/api/entity/EntityTeleportAsyncEvent.java b/src/main/java/me/earthme/luminol/api/entity/EntityTeleportAsyncEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..04e1d7b39e1c140d6c9910c371d2fc65468dfc38
+index 0000000000000000000000000000000000000000..4635a56c60c836675150faca51755dbe09543840
 --- /dev/null
 +++ b/src/main/java/me/earthme/luminol/api/entity/EntityTeleportAsyncEvent.java
-@@ -0,0 +1,80 @@
+@@ -0,0 +1,90 @@
 +package me.earthme.luminol.api.entity;
 +
 +import org.apache.commons.lang3.Validate;
@@ -34,7 +34,7 @@ index 0000000000000000000000000000000000000000..04e1d7b39e1c140d6c9910c371d2fc65
 +
 +    private final Entity entity;
 +    private final PlayerTeleportEvent.TeleportCause teleportCause;
-+    private final Location destination;
++    private Location destination;
 +
 +    public EntityTeleportAsyncEvent(Entity entity, PlayerTeleportEvent.TeleportCause teleportCause, Location destination) {
 +        Validate.notNull(entity, "entity cannot be a null value!");
@@ -68,6 +68,16 @@ index 0000000000000000000000000000000000000000..04e1d7b39e1c140d6c9910c371d2fc65
 +     */
 +    public @NotNull Location getDestination() {
 +        return this.destination;
++    }
++
++    /**
++     * Set the destination of the teleport
++     * @param destination the destination
++     */
++    public void setDestination(Location destination) {
++        Validate.notNull(destination, "destination cannot be a null value!");
++
++        this.destination = destination;
 +    }
 +
 +    @Override

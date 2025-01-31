@@ -19,26 +19,46 @@ index 9fd3fe181df2ce6dbe695f6463d3940ac4c01167..822d401150d3764004b2570da828b4f6
              );
          });
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 406c382ae2fdaa7d8996d250487bbdfb7e4bb7f9..c742695ea24588826f50740ad442f3234953ba81 100644
+index 406c382ae2fdaa7d8996d250487bbdfb7e4bb7f9..e41aef2b9e7204b35202d66eb17985e3731d9611 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -4164,6 +4164,15 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4164,6 +4164,35 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          }
  
          // TODO any events that can modify go HERE
 +        // Luminol start - Add missing teleportation apis
-+        if (!new me.earthme.luminol.api.entity.EntityTeleportAsyncEvent(
++        org.bukkit.Location destinationLoc;
++
++        if (pitch == null) {
++            if (yaw == null) {
++                destinationLoc = io.papermc.paper.util.MCUtil.toLocation(destination, pos, Float.NaN, Float.NaN);
++            } else {
++                destinationLoc = io.papermc.paper.util.MCUtil.toLocation(destination, pos, yaw, Float.NaN);
++            }
++        }else {
++            if (yaw == null) {
++                destinationLoc = io.papermc.paper.util.MCUtil.toLocation(destination, pos, Float.NaN, pitch);
++            }else {
++                destinationLoc = io.papermc.paper.util.MCUtil.toLocation(destination, pos, yaw, pitch);
++            }
++        }
++
++        final me.earthme.luminol.api.entity.EntityTeleportAsyncEvent wrapped = new me.earthme.luminol.api.entity.EntityTeleportAsyncEvent(
 +                this.getBukkitEntity(),
 +                cause,
-+                io.papermc.paper.util.MCUtil.toLocation(destination, pos, yaw ,pitch)
-+        ).callEvent()) {
++                destinationLoc
++        );
++        if (!wrapped.callEvent()) {
 +            return false;
 +        }
++
++        destination = ((org.bukkit.craftbukkit.CraftWorld) wrapped.getDestination().getWorld()).getHandle();
++        pos = io.papermc.paper.util.MCUtil.toVec3(wrapped.getDestination());
 +        // Luminol end
  
          // check for same region
          if (destination == this.level()) {
-@@ -4280,7 +4289,20 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4280,7 +4309,20 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
              // we just select the spawn position
              case END: {
                  if (destination.getTypeKey() == net.minecraft.world.level.dimension.LevelStem.END) {
@@ -60,7 +80,7 @@ index 406c382ae2fdaa7d8996d250487bbdfb7e4bb7f9..c742695ea24588826f50740ad442f323
                      // need to load chunks so we can create the platform
                      destination.moonrise$loadChunksAsync(
                          targetPos, 16, // load 16 blocks to be safe from block physics
-@@ -4305,7 +4327,20 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4305,7 +4347,20 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                          }
                      );
                  } else {
@@ -82,7 +102,7 @@ index 406c382ae2fdaa7d8996d250487bbdfb7e4bb7f9..c742695ea24588826f50740ad442f323
                      // need to load chunk for heightmap
                      destination.moonrise$loadChunksAsync(
                          spawnPos, 0,
-@@ -4355,8 +4390,20 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4355,8 +4410,20 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
  
                  WorldBorder destinationBorder = destination.getWorldBorder();
                  double dimensionScale = net.minecraft.world.level.dimension.DimensionType.getTeleportationScale(origin.dimensionType(), destination.dimensionType());
@@ -104,7 +124,7 @@ index 406c382ae2fdaa7d8996d250487bbdfb7e4bb7f9..c742695ea24588826f50740ad442f323
                  ca.spottedleaf.concurrentutil.completable.CallbackCompletable<BlockUtil.FoundRectangle> portalFound
                      = new ca.spottedleaf.concurrentutil.completable.CallbackCompletable<>();
  
-@@ -4493,9 +4540,18 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4493,9 +4560,18 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          if (!this.canPortalAsync(destination, takePassengers)) {
              return false;
          }
@@ -124,7 +144,7 @@ index 406c382ae2fdaa7d8996d250487bbdfb7e4bb7f9..c742695ea24588826f50740ad442f323
          // Kaiiju end
  
          Vec3 initialPosition = this.position();
-@@ -4569,6 +4625,9 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4569,6 +4645,9 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                          tpComplete.accept(teleported);
                      }
                      // Kaiiju end
