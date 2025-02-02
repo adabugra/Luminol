@@ -5,7 +5,6 @@ Subject: [PATCH] Skip collision check if the block is not belong to current
  tick region
 
 A temporary fix of these issues:
-https://github.com/PaperMC/Folia/issues/324
 https://github.com/PaperMC/Folia/issues/311
 
 Due to that mojang won't ignore the blocks the entity passed by, and sometimes the old position may not be updated and it points to a block that we don't own it, and it will access it during applyEffectsFromBlocks.So the best way to fix that is to skip the collision check of that block because it was already not owned by us and it's not necessary to check it
@@ -14,7 +13,7 @@ Related to mojang's bug fix:
 https://bugs.mojang.com/browse/MC-92875
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 1868cb351d030d1997b5c81a184657085261c2f3..215462da04ca040e25d3cbfcbdbedfbca14e8224 100644
+index aa4337942b4b9b7dd746b9b9c5a052d626b1e72c..61814607a6c8e4ce8d07645f005ea8d53f624c95 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -1675,6 +1675,12 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
