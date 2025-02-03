@@ -65,7 +65,7 @@ For maven
 ## Contact
 > If you are interested in this project or have any issue, feel free to ask us.
 
-**QQ Group: [368632360](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=MfosKhcDd8Fdxn1MREuZ8Krbf9T6jiBC&authKey=3cm6qdHohON3gHnuD63FK4k07fIbrWnY4hdyq8OmELsfjMVP1kbFTJY9mRyM2Rkj&noverify=0&group_code=368632360)** | QQ Channel: [Click To Join](https://pd.qq.com/s/eq9krf9j) | Telegram: [Click To Join](https://t.me/LuminolMC) | Discord: [Click To Join](https://discord.gg/Qd7m3V6eDx)
+**QQ Group: [368632360](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=hTPlI5j6XB8pgk4sdx6RkjhBPGG1r4IR&authKey=pnu6uCKQP7Sja2CJWC15Qi3BeI%2FAsh8tU4m5muufMBjbB3zz%2BwHBZCTRRdSNKhld&noverify=0&group_code=1015048616)** | QQ Channel: [Click To Join](https://pd.qq.com/s/eq9krf9j) | Telegram: [Click To Join](https://t.me/LuminolMinecraft) | Discord: [Click To Join](https://discord.gg/Qd7m3V6eDx)
 
 ## About Issue
 When you meet any problems, just ask us, we will do our best to solve it, but remember to state your problem clear and provide enough logs etc.</br>
