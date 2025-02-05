@@ -94,7 +94,7 @@ index d9cc1d7e56c37d5ce92544edc10e89dbc89dd15d..39e7689be243b9c99b507d665f659135
      public EntityType(
          EntityType.EntityFactory<T> factory,
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 0e020dfebe06dce4c19beb10c961ea9e8a35a415..320f2131d3c5aee68d5eda43db0d5745ec9358db 100644
+index 0e020dfebe06dce4c19beb10c961ea9e8a35a415..49f927c20b84e47ed2b0e57beecb3aa746448f5a 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
 @@ -210,6 +210,25 @@ public abstract class Player extends LivingEntity {
@@ -123,12 +123,13 @@ index 0e020dfebe06dce4c19beb10c961ea9e8a35a415..320f2131d3c5aee68d5eda43db0d5745
  
      public Player(Level level, BlockPos pos, float yRot, GameProfile gameProfile) {
          super(EntityType.PLAYER, level);
-@@ -262,6 +281,24 @@ public abstract class Player extends LivingEntity {
+@@ -262,6 +281,26 @@ public abstract class Player extends LivingEntity {
  
      @Override
      public void tick() {
 +        // Luminol start - Ray tracing entity tracker
 +        if (!me.earthme.luminol.config.modules.experiment.RayTrackingEntityTrackerConfig.enabled) {
++            if (this.cullTask != null) this.cullTask.signalStop();
 +            this.cullTask = null;
 +        }else {
 +            final com.logisticscraft.occlusionculling.OcclusionCullingInstance culling = new com.logisticscraft.occlusionculling.OcclusionCullingInstance(
@@ -143,20 +144,13 @@ index 0e020dfebe06dce4c19beb10c961ea9e8a35a415..320f2131d3c5aee68d5eda43db0d5745
 +            );
 +        }
 +        if (this.cullTask != null) this.cullTask.setup();
++        if (this.cullTask != null) this.cullTask.requestCullSignal(); // Luminol - Ray tracing entity tracker
 +        // Luminol end
 +
          this.noPhysics = this.isSpectator();
          if (this.isSpectator() || this.isPassenger()) {
              this.setOnGround(false);
-@@ -345,6 +382,7 @@ public abstract class Player extends LivingEntity {
-         if (this.currentImpulseContextResetGraceTime > 0) {
-             this.currentImpulseContextResetGraceTime--;
-         }
-+        if (this.cullTask != null) this.cullTask.requestCullSignal(); // Luminol - Ray tracing entity tracker
-     }
- 
-     @Override
-@@ -1502,6 +1540,7 @@ public abstract class Player extends LivingEntity {
+@@ -1502,6 +1541,7 @@ public abstract class Player extends LivingEntity {
          if (this.containerMenu != null && this.hasContainerOpen()) {
              this.doCloseContainer();
          }
